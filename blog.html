@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog | Verix Web</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --header-bg: #ffffff;
+        }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg); 
+            color: var(--text);
+            line-height: 1.6;
+        }
+        header { 
+            background: var(--header-bg); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            padding: 1rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        header h1 { margin: 0; color: var(--primary); font-size: 1.5rem; }
+        nav a { 
+            text-decoration: none; 
+            color: var(--text); 
+            margin-left: 20px; 
+            font-weight: 500; 
+        }
+        nav a:hover { color: var(--primary); }
+        main { 
+            max-width: 1000px; 
+            margin: 2rem auto; 
+            padding: 0 20px; 
+            min-height: 60vh;
+        }
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: linear-gradient(to right, #eff6ff, #dbeafe);
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+        }
+        .hero h2 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--secondary); }
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn:hover { background: var(--secondary); }
+        
+        /* Estilos para la Galería de Tarjetas */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .card-img { height: 150px; background-color: #cbd5e1; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 2rem; }
+        .card-body { padding: 20px; }
+        .card-title { margin-top: 0; color: var(--text); font-size: 1.25rem; }
+        .card-text { color: #64748b; font-size: 0.9em; margin-bottom: 1rem; }
+        .card-link { color: var(--primary); text-decoration: none; font-weight: bold; font-size: 0.9em; }
+
+        footer { 
+            text-align: center; 
+            padding: 2rem; 
+            background: #e2e8f0; 
+            margin-top: 3rem; 
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Verix Site</h1>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="blog.html">Blog</a>
+            <a href="contact.html">Contacto</a>
+        </nav>
+    </header>
+    <main>
+        
+<div class="hero" style="background: linear-gradient(to right, #f0fdf4, #dcfce7);">
+    <h2 style="color: #166534;">Galería de Tarjetas</h2>
+    <p>Aquí tienes una colección de elementos visuales listos para tu información.</p>
+</div>
+
+<div class="card-grid">
+    <!-- Tarjeta 1 -->
+    <div class="card">
+        <div class="card-img">📷</div>
+        <div class="card-body">
+            <h3 class="card-title">Proyecto Alpha</h3>
+            <p class="card-text">Esta es una tarjeta de ejemplo. Puedes editar este contenido en content/blog.html.</p>
+            <a href="#" class="card-link">Ver Detalles &rarr;</a>
+        </div>
+    </div>
+    <!-- Tarjeta 2 -->
+    <div class="card">
+        <div class="card-img">🎨</div>
+        <div class="card-body">
+            <h3 class="card-title">Diseño UI</h3>
+            <p class="card-text">Un espacio limpio y moderno para mostrar tu trabajo o artículos.</p>
+            <a href="#" class="card-link">Ver Detalles &rarr;</a>
+        </div>
+    </div>
+    <!-- Tarjeta 3 -->
+    <div class="card">
+        <div class="card-img">⚙️</div>
+        <div class="card-body">
+            <h3 class="card-title">Ingeniería</h3>
+            <p class="card-text">Estructura robusta generada con Python y plantillas dinámicas.</p>
+            <a href="#" class="card-link">Ver Detalles &rarr;</a>
+        </div>
+    </div>
+    <!-- Tarjeta 4 -->
+    <div class="card">
+        <div class="card-img">🚀</div>
+        <div class="card-body">
+            <h3 class="card-title">Futuro</h3>
+            <p class="card-text">Agrega más tarjetas copiando y pegando este bloque de código HTML.</p>
+            <a href="#" class="card-link">Ver Detalles &rarr;</a>
+        </div>
+    </div>
+</div>
+
+    </main>
+    <footer>
+        <p>&copy; 2026 r1ch0n & Verix Systems</p>
+    </footer>
+</body>
+</html>
