@@ -183,6 +183,7 @@
         .capsule-row:hover { background: rgba(56, 189, 248, 0.1); cursor: pointer; }
         .capsule-action { background: none; border: 1px solid #38bdf8; color: #38bdf8; cursor: pointer; padding: 2px 8px; border-radius: 3px; }
         .capsule-action:hover { background: #38bdf8; color: black; }
+        .btn-dl { color: #4ade80; border-color: #4ade80; margin-right: 5px; }
         
         /* Botones de Acción Rápida */
         .action-btn { background: #334155; border: 1px solid #475569; color: white; padding: 5px 10px; cursor: pointer; font-size: 0.8rem; margin-right: 5px; border-radius: 4px; }
@@ -680,6 +681,67 @@
         function copyCapsuleID(id) {
             navigator.clipboard.writeText(id).then(() => alert("ID de cápsula copiado: " + id));
         }
+        
+        // --- LÓGICA DE DESENCRIPTADO DE CÁPSULAS (NUEVO) ---
+        async function decryptCapsule(filename) {
+            // 1. Solicitar Llaves
+            const p1 = prompt("🔐 RITUAL DE APERTURA
+Ingresa el Primer Texto Sagrado:");
+            if (!p1) return;
+            const p2 = prompt("🔐 RITUAL DE APERTURA
+Ingresa el Segundo Texto Sagrado:");
+            if (!p2) return;
+            
+            const password = p1 + "||VERIX_RITUAL||" + p2;
+            alert("⏳ Procesando... Verix está intentando abrir el sello.");
+
+            try {
+                // 2. Descargar el archivo .vx
+                const response = await fetch('capsulas/' + filename);
+                if (!response.ok) throw new Error("No se encontró el archivo de alma.");
+                const blob = await response.blob();
+                const buffer = await blob.arrayBuffer();
+
+                // 3. Preparar Criptografía (Replicando lógica de Python Fernet)
+                // Header (13 bytes) + Token
+                const dataView = new Uint8Array(buffer);
+                const payloadBytes = dataView.slice(13); // Quitar 'VERIX_SOUL_v1'
+                const payloadStr = new TextDecoder().decode(payloadBytes); // Base64
+                
+                // Decodificar Base64 a bytes crudos
+                const fernetBytes = Uint8Array.from(atob(payloadStr), c => c.charCodeAt(0));
+
+                // Derivar Claves (SHA256 del password)
+                const enc = new TextEncoder();
+                const keyHash = await crypto.subtle.digest("SHA-256", enc.encode(password));
+                const keyBytes = new Uint8Array(keyHash);
+                
+                // Fernet: Primera mitad = Firma (HMAC), Segunda mitad = Encriptación (AES)
+                const encryptKeyBytes = keyBytes.slice(16, 32);
+                
+                // Extraer IV (16 bytes) y Ciphertext
+                // Estructura: Version(1) + Timestamp(8) + IV(16) + Ciphertext(...) + HMAC(32)
+                const iv = fernetBytes.slice(9, 25);
+                const ciphertext = fernetBytes.slice(25, fernetBytes.length - 32);
+
+                // 4. Desencriptar (AES-128-CBC)
+                const key = await crypto.subtle.importKey("raw", encryptKeyBytes, {name: "AES-CBC"}, false, ["decrypt"]);
+                const decrypted = await crypto.subtle.decrypt({name: "AES-CBC", iv: iv}, key, ciphertext);
+
+                // 5. Entregar ZIP Limpio
+                const url = URL.createObjectURL(new Blob([decrypted], {type: "application/zip"}));
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename.replace(".vx", "_restored.zip");
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+            } catch (e) {
+                console.error(e);
+                alert("❌ FALLO CRÍTICO: Las llaves son incorrectas o el alma está corrupta.");
+            }
+        }
 
         // --- LÓGICA GALERÍA CÁPSULAS ---
         function renderCapsules() {
@@ -691,12 +753,15 @@
             
             filtered.forEach(c => {
                 const row = `
-                    <tr class="capsule-row" onclick="copyCapsuleID('${c.id}')" title="Click para copiar ID">
+                    <tr class="capsule-row">
                         <td><span style="color: #facc15;">${c.id}</span></td>
                         <td style="font-weight:bold; color:white;">${c.name}</td>
                         <td>${c.date}</td>
                         <td>${c.size}</td>
-                        <td><span style="color: #a855f7;">🔒 COPIAR ID</span></td>
+                        <td>
+                            <a href="capsulas/${c.filename}" download class="capsule-action btn-dl">⬇️ BAJAR</a>
+                            <button onclick="decryptCapsule('${c.filename}')" class="capsule-action">🔓 ABRIR</button>
+                        </td>
                     </tr>`;
                 tbody.innerHTML += row;
             });
