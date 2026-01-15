@@ -164,6 +164,10 @@
                 <span class="slider"></span>
             </label>
         </div>
+        
+        <button id="gate-btn" onclick="enterSystem()" disabled style="margin-top: 50px; padding: 15px 40px; font-size: 1.2rem; background: #1a1a1a; color: #444; border: 2px solid #333; cursor: not-allowed; transition: all 0.3s; font-family: monospace; letter-spacing: 2px; text-transform: uppercase; border-radius: 5px;">
+            🔴 ACCESO BLOQUEADO
+        </button>
     </div>
 
     <!-- 2. El Ritual de Acceso -->
@@ -332,6 +336,7 @@
         function checkGate() {
             const switches = document.querySelectorAll('.access-switch');
             const labels = document.querySelectorAll('.switch-label');
+            const btn = document.getElementById('gate-btn');
             
             // Iluminar etiquetas individualmente
             switches.forEach((s, idx) => {
@@ -343,24 +348,33 @@
             const allOn = Array.from(switches).every(s => s.checked);
             
             if (allOn) {
-                // Feedback Visual de Acceso
-                const title = document.querySelector('#security-gate h2');
-                if(title) {
-                    title.innerText = "🔓 ACCESO CONCEDIDO";
-                    title.style.color = "#0f0";
-                    title.style.textShadow = "0 0 20px #0f0";
-                }
-
-                setTimeout(() => {
-                    document.getElementById('security-gate').style.display = 'none';
-                    document.getElementById('invocation-modal').style.display = 'block';
-                    step = 1;
-                    document.getElementById('step-text').innerText = "PRIMERA LLAVE (Texto 1):";
-                    const inp = document.getElementById('secret-input');
-                    inp.value = "";
-                    inp.focus();
-                }, 800); // Pausa para ver el efecto
+                btn.disabled = false;
+                btn.innerHTML = "🟢 ENTRAR AL SISTEMA";
+                btn.style.background = "#0f0";
+                btn.style.color = "black";
+                btn.style.borderColor = "#0f0";
+                btn.style.boxShadow = "0 0 30px #0f0";
+                btn.style.cursor = "pointer";
+                btn.style.fontWeight = "bold";
+            } else {
+                btn.disabled = true;
+                btn.innerHTML = "🔴 ACCESO BLOQUEADO";
+                btn.style.background = "#1a1a1a";
+                btn.style.color = "#444";
+                btn.style.borderColor = "#333";
+                btn.style.boxShadow = "none";
+                btn.style.cursor = "not-allowed";
             }
+        }
+        
+        function enterSystem() {
+            document.getElementById('security-gate').style.display = 'none';
+            document.getElementById('invocation-modal').style.display = 'block';
+            step = 1;
+            document.getElementById('step-text').innerText = "PRIMERA LLAVE (Texto 1):";
+            const inp = document.getElementById('secret-input');
+            inp.value = "";
+            inp.focus();
         }
 
         // 2. Lógica de Verificación
