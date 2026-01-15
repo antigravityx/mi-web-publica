@@ -111,6 +111,8 @@
             background-color: white;
             z-index: 9999;
             cursor: default; /* Cursor normal para no levantar sospechas */
+            user-select: none; -webkit-user-select: none;
+            touch-action: manipulation;
         }
 
         /* Interfaz Segura (Oculta por defecto) */
@@ -386,20 +388,28 @@
             } catch (e) { return "ERROR: Llave incorrecta o datos corruptos."; }
         }
 
-        // 1. Detectar Doble Click en la nada
-        camo.addEventListener('dblclick', function() {
-            // Efecto visual sutil al activar
-            camo.style.transition = "background-color 0.5s";
-            camo.style.backgroundColor = "#000"; 
-            
-            setTimeout(() => {
-                camo.style.display = 'none';
-                modal.style.display = 'block';
-                step = 1;
-                stepText.innerText = "PRIMERA LLAVE (Texto 1):";
-                input.value = "";
-                input.focus();
-            }, 400);
+        // 1. Detectar Doble Click (o ráfaga de clicks) - Mejorado
+        let clickCount = 0;
+        let clickTimer;
+        
+        camo.addEventListener('click', function() {
+            clickCount++;
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => clickCount = 0, 600);
+
+            if (clickCount >= 2) {
+                clickCount = 0;
+                camo.style.transition = "background-color 0.5s";
+                camo.style.backgroundColor = "#000"; 
+                setTimeout(() => {
+                    camo.style.display = 'none';
+                    modal.style.display = 'block';
+                    step = 1;
+                    stepText.innerText = "PRIMERA LLAVE (Texto 1):";
+                    input.value = "";
+                    input.focus();
+                }, 400);
+            }
         });
 
         // 2. Lógica de Verificación
