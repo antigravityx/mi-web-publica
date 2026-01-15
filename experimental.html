@@ -388,41 +388,28 @@
             } catch (e) { return "ERROR: Llave incorrecta o datos corruptos."; }
         }
 
-        // 1. SISTEMA DE ACCESO ROBUSTO (Triple Redundancia)
-        let accessTriggered = false;
+        // 1. SISTEMA DE ACCESO PURO (Solo Doble Click)
+        let clickStack = 0;
         
-        function triggerAccess() {
-            if (accessTriggered) return;
-            accessTriggered = true;
+        camo.addEventListener('click', function() {
+            clickStack++;
             
-            camo.style.transition = "background-color 0.5s";
-            camo.style.backgroundColor = "#000"; 
-            setTimeout(() => {
+            // Si detectamos 2 clicks (o más)
+            if (clickStack >= 2) {
+                // Acción Inmediata: Quitar pantalla blanca sin animaciones
                 camo.style.display = 'none';
                 modal.style.display = 'block';
+                
                 step = 1;
                 stepText.innerText = "PRIMERA LLAVE (Texto 1):";
                 input.value = "";
                 input.focus();
-            }, 400);
-        }
-
-        // A. Click Simple (Acumulativo - Más tolerante: 2 clicks en 2 segundos)
-        let taps = 0;
-        camo.addEventListener('click', () => {
-            taps++;
-            if (taps >= 2) triggerAccess();
-            setTimeout(() => taps = 0, 2000);
-        });
-
-        // B. Doble Click Nativo (Infalible en PC)
-        camo.addEventListener('dblclick', triggerAccess);
-
-        // C. Teclado (Cualquier tecla desbloquea - Fallback definitivo)
-        window.addEventListener('keydown', (e) => {
-            if (!accessTriggered && camo.style.display !== 'none') {
-                triggerAccess();
+                
+                clickStack = 0;
             }
+            
+            // Reiniciar contador rápido (500ms) para evitar falsos positivos
+            setTimeout(() => { clickStack = 0; }, 500);
         });
 
         // 2. Lógica de Verificación
