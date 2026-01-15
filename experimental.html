@@ -168,6 +168,22 @@
         .terminal-log { background: black; color: #0f0; font-family: monospace; padding: 10px; height: 200px; overflow-y: auto; border: 1px solid #333; margin-bottom: 10px; font-size: 0.8rem; }
         .data-block { background: #1e293b; padding: 10px; margin-bottom: 10px; border-left: 3px solid #38bdf8; }
         
+        /* Estilos JSON Formateado (Árbol de Datos) */
+        .json-container { font-family: 'Consolas', monospace; font-size: 0.9rem; }
+        .json-key { color: #38bdf8; font-weight: bold; }
+        .json-string { color: #a5f3fc; }
+        .json-number { color: #facc15; }
+        .json-boolean { color: #f472b6; }
+        .json-block { margin-left: 15px; border-left: 1px solid #334155; padding-left: 10px; margin-top: 2px; }
+
+        /* Tabla de Cápsulas */
+        .capsule-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        .capsule-table th { text-align: left; border-bottom: 1px solid #38bdf8; padding: 8px; color: #38bdf8; }
+        .capsule-table td { border-bottom: 1px solid #333; padding: 8px; color: #94a3b8; }
+        .capsule-row:hover { background: rgba(56, 189, 248, 0.1); cursor: pointer; }
+        .capsule-action { background: none; border: 1px solid #38bdf8; color: #38bdf8; cursor: pointer; padding: 2px 8px; border-radius: 3px; }
+        .capsule-action:hover { background: #38bdf8; color: black; }
+        
         /* Animación de Escaneo */
         @keyframes scan { 0% { width: 0%; } 100% { width: 100%; } }
         .progress-bar { height: 5px; background: #38bdf8; width: 0%; transition: width 0.2s; }
@@ -200,7 +216,7 @@
         <div class="control-grid">
             <div class="control-btn" onclick="openModule('radar')"><div class="icon">📡</div><span>Radar</span></div>
             <div class="control-btn" onclick="openModule('db')"><div class="icon">💾</div><span>Base de Datos</span></div>
-            <div class="control-btn"><div class="icon">🔐</div><span>Criptografía</span></div>
+            <div class="control-btn" onclick="openModule('capsules')"><div class="icon">📂</div><span>Archivos X</span></div>
             <div class="control-btn"><div class="icon">🌍</div><span>Geo-Red</span></div>
             <div class="control-btn"><div class="icon">⚡</div><span>Energía</span></div>
             <div class="control-btn"><div class="icon">👁️</div><span>Vigilancia</span></div>
@@ -248,8 +264,28 @@
         
         <textarea id="db-input" placeholder="Pega aquí el código encriptado..." style="width: 100%; height: 80px; background: #111; color: #fff; border: 1px solid #444; padding: 10px;"></textarea>
         <button onclick="decryptData()" style="background: #0f0; color: black; margin-top: 10px;">DESENCRIPTAR Y VISUALIZAR</button>
+        <button onclick="openModule('capsules')" style="background: #334155; color: white; margin-top: 10px; float: right; border: 1px solid #94a3b8;">📂 IR A GALERÍA DE CÁPSULAS</button>
         
-        <div id="db-viewer" style="margin-top: 20px; background: #000; padding: 15px; border: 1px solid #333; color: #0f0; font-family: monospace; white-space: pre-wrap; display: none;">
+        <div id="db-viewer" style="margin-top: 20px; background: #0f172a; padding: 15px; border: 1px solid #333; color: #0f0; font-family: monospace; display: none; max-height: 300px; overflow-y: auto;">
+        </div>
+    </div>
+
+    <!-- MÓDULO: GALERÍA DE CÁPSULAS (ARCHIVOS X) -->
+    <div id="mod-capsules" class="module-window">
+        <span class="close-btn" onclick="closeModules()">×</span>
+        <h2 style="color: #a855f7; border-bottom: 1px solid #333; padding-bottom: 10px;">📂 ARCHIVOS X: CÁPSULAS</h2>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="text" id="search-capsule" placeholder="Buscar por ID, Alias o Fecha..." onkeyup="renderCapsules()" style="background: #111; border: 1px solid #444; color: white; padding: 8px; flex-grow: 1;">
+        </div>
+
+        <div style="height: 350px; overflow-y: auto;">
+            <table class="capsule-table">
+                <thead><tr><th>ID</th><th>ALIAS / NOMBRE</th><th>FECHA</th><th>TAMAÑO</th><th>ESTADO</th></tr></thead>
+                <tbody id="capsule-list-body">
+                    <!-- Inyectado por JS -->
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -274,6 +310,7 @@
         const KEY_1_HASH = "6900cebdbf71b47f57aca6ac4f1435d06e457e5d9136c31ad550ea3f2c3f0008";
         const KEY_2_HASH = "38347f1dc1fbcc9838b5c2a66b7a6b0f55b3ccf8dc98ebbbb5851360b971fa1d";
         const SALT = "VERIX_SEAL_OF_PROTECTION_v1";
+        const CAPSULES_DB = [{"id": "2394F75B", "name": "soul_backup_20260112_1952.vx", "date": "2026-01-12 19:52:00", "size": "0.02 MB"}, {"id": "7E205460", "name": "soul_backup_20260112_2103.vx", "date": "2026-01-12 21:03:37", "size": "0.03 MB"}];
         
         let SESSION_KEY = null; // Llave maestra derivada para encriptar datos
 
@@ -355,6 +392,7 @@
                     // Generar Llave de Sesión Real (Usando las dos palabras originales)
                     SESSION_KEY = await generateKeyFromPass(window.tempKeyPart + val);
                     window.tempKeyPart = null; // Limpiar memoria
+                    renderCapsules(); // Cargar galería
                     success();
                 } else {
                     fail();
@@ -480,7 +518,52 @@
             
             const result = await decryptContent(cleanInput);
             viewer.style.display = 'block';
-            viewer.innerText = result;
+            
+            // Intentar formatear JSON si es posible
+            try {
+                const json = JSON.parse(result);
+                viewer.innerHTML = '<div class="json-container">' + formatJSON(json) + '</div>';
+            } catch (e) {
+                viewer.innerText = result; // Si no es JSON, mostrar texto plano
+            }
+        }
+
+        // --- UTILIDAD: FORMATO JSON ---
+        function formatJSON(obj) {
+            if (typeof obj !== 'object' || obj === null) {
+                if (typeof obj === 'string') return `<span class="json-string">"${obj}"</span>`;
+                if (typeof obj === 'number') return `<span class="json-number">${obj}</span>`;
+                if (typeof obj === 'boolean') return `<span class="json-boolean">${obj}</span>`;
+                return obj;
+            }
+            let html = '';
+            for (let key in obj) {
+                html += `<div class="json-block"><span class="json-key">${key}:</span> ${formatJSON(obj[key])}</div>`;
+            }
+            return html;
+        }
+
+        // --- LÓGICA GALERÍA CÁPSULAS ---
+        function renderCapsules() {
+            const tbody = document.getElementById('capsule-list-body');
+            const search = document.getElementById('search-capsule').value.toLowerCase();
+            tbody.innerHTML = '';
+            
+            const filtered = CAPSULES_DB.filter(c => c.name.toLowerCase().includes(search) || c.id.toLowerCase().includes(search) || c.date.includes(search));
+            
+            filtered.forEach(c => {
+                const row = `
+                    <tr class="capsule-row">
+                        <td><span style="color: #facc15;">${c.id}</span></td>
+                        <td>${c.name}</td>
+                        <td>${c.date}</td>
+                        <td>${c.size}</td>
+                        <td><span style="color: #a855f7;">🔒 ENCRIPTADO</span></td>
+                    </tr>`;
+                tbody.innerHTML += row;
+            });
+            
+            if (filtered.length === 0) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No se encontraron cápsulas.</td></tr>';
         }
     </script>
 </body>
