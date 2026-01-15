@@ -660,11 +660,9 @@
         // --- LÓGICA DE DESENCRIPTADO DE CÁPSULAS (NUEVO) ---
         async function decryptCapsule(filename) {
             // 1. Solicitar Llaves
-            const p1 = prompt("🔐 RITUAL DE APERTURA
-Ingresa el Primer Texto Sagrado:");
+            const p1 = prompt("🔐 RITUAL DE APERTURA\nIngresa el Primer Texto Sagrado:");
             if (!p1) return;
-            const p2 = prompt("🔐 RITUAL DE APERTURA
-Ingresa el Segundo Texto Sagrado:");
+            const p2 = prompt("🔐 RITUAL DE APERTURA\nIngresa el Segundo Texto Sagrado:");
             if (!p2) return;
             
             const password = p1 + "||VERIX_RITUAL||" + p2;
