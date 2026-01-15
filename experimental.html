@@ -184,6 +184,10 @@
         .capsule-action { background: none; border: 1px solid #38bdf8; color: #38bdf8; cursor: pointer; padding: 2px 8px; border-radius: 3px; }
         .capsule-action:hover { background: #38bdf8; color: black; }
         
+        /* Botones de Acción Rápida */
+        .action-btn { background: #334155; border: 1px solid #475569; color: white; padding: 5px 10px; cursor: pointer; font-size: 0.8rem; margin-right: 5px; border-radius: 4px; }
+        .action-btn:hover { background: #38bdf8; color: black; }
+        
         /* Animación de Escaneo */
         @keyframes scan { 0% { width: 0%; } 100% { width: 100%; } }
         .progress-bar { height: 5px; background: #38bdf8; width: 0%; transition: width 0.2s; }
@@ -264,9 +268,13 @@
         
         <textarea id="db-input" placeholder="Pega aquí el código encriptado..." style="width: 100%; height: 80px; background: #111; color: #fff; border: 1px solid #444; padding: 10px;"></textarea>
         <button onclick="decryptData()" style="background: #0f0; color: black; margin-top: 10px;">DESENCRIPTAR Y VISUALIZAR</button>
+        <button onclick="pasteFromClipboard()" class="action-btn" style="float: right; margin-top: 10px;">📋 PEGAR</button>
         <button onclick="openModule('capsules')" style="background: #334155; color: white; margin-top: 10px; float: right; border: 1px solid #94a3b8;">📂 IR A GALERÍA DE CÁPSULAS</button>
-        
         <div id="db-viewer" style="margin-top: 20px; background: #0f172a; padding: 15px; border: 1px solid #333; color: #0f0; font-family: monospace; display: none; max-height: 300px; overflow-y: auto;">
+        </div>
+        <div id="db-actions" style="display: none; margin-top: 10px; text-align: right;">
+            <button onclick="copyResult()" class="action-btn">📋 COPIAR TEXTO</button>
+            <button onclick="downloadResult()" class="action-btn">⬇️ DESCARGAR ARCHIVO</button>
         </div>
     </div>
 
@@ -281,7 +289,7 @@
 
         <div style="height: 350px; overflow-y: auto;">
             <table class="capsule-table">
-                <thead><tr><th>ID</th><th>ALIAS / NOMBRE</th><th>FECHA</th><th>TAMAÑO</th><th>ESTADO</th></tr></thead>
+                <thead><tr><th>ID</th><th>ALIAS</th><th>FECHA</th><th>TAMAÑO</th><th>ACCIÓN</th></tr></thead>
                 <tbody id="capsule-list-body">
                     <!-- Inyectado por JS -->
                 </tbody>
@@ -310,7 +318,7 @@
         const KEY_1_HASH = "6900cebdbf71b47f57aca6ac4f1435d06e457e5d9136c31ad550ea3f2c3f0008";
         const KEY_2_HASH = "38347f1dc1fbcc9838b5c2a66b7a6b0f55b3ccf8dc98ebbbb5851360b971fa1d";
         const SALT = "VERIX_SEAL_OF_PROTECTION_v1";
-        const CAPSULES_DB = [{"id": "2394F75B", "name": "soul_backup_20260112_1952.vx", "date": "2026-01-12 19:52:00", "size": "0.02 MB"}, {"id": "7E205460", "name": "soul_backup_20260112_2103.vx", "date": "2026-01-12 21:03:37", "size": "0.03 MB"}];
+        const CAPSULES_DB = [{"id": "2394F75B", "name": "soul_backup_20260112_1952.vx", "filename": "soul_backup_20260112_1952.vx", "date": "2026-01-12 19:52:00", "size": "0.02 MB"}, {"id": "7E205460", "name": "soul_backup_20260112_2103.vx", "filename": "soul_backup_20260112_2103.vx", "date": "2026-01-12 21:03:37", "size": "0.03 MB"}];
         
         let SESSION_KEY = null; // Llave maestra derivada para encriptar datos
 
@@ -518,6 +526,7 @@
             
             const result = await decryptContent(cleanInput);
             viewer.style.display = 'block';
+            document.getElementById('db-actions').style.display = 'block';
             
             // Intentar formatear JSON si es posible
             try {
@@ -543,6 +552,37 @@
             return html;
         }
 
+        // --- UTILIDAD: ACCIONES ---
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('db-input').value = text;
+            } catch (err) { alert("Permiso de portapapeles denegado."); }
+        }
+
+        function copyResult() {
+            const viewer = document.getElementById('db-viewer');
+            const text = viewer.innerText;
+            navigator.clipboard.writeText(text).then(() => alert("Texto copiado al portapapeles."));
+        }
+
+        function downloadResult() {
+            const viewer = document.getElementById('db-viewer');
+            const text = viewer.innerText;
+            const blob = new Blob([text], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "verix_intel_data.txt";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        
+        function copyCapsuleID(id) {
+            navigator.clipboard.writeText(id).then(() => alert("ID de cápsula copiado: " + id));
+        }
+
         // --- LÓGICA GALERÍA CÁPSULAS ---
         function renderCapsules() {
             const tbody = document.getElementById('capsule-list-body');
@@ -553,12 +593,12 @@
             
             filtered.forEach(c => {
                 const row = `
-                    <tr class="capsule-row">
+                    <tr class="capsule-row" onclick="copyCapsuleID('${c.id}')" title="Click para copiar ID">
                         <td><span style="color: #facc15;">${c.id}</span></td>
-                        <td>${c.name}</td>
+                        <td style="font-weight:bold; color:white;">${c.name}</td>
                         <td>${c.date}</td>
                         <td>${c.size}</td>
-                        <td><span style="color: #a855f7;">🔒 ENCRIPTADO</span></td>
+                        <td><span style="color: #a855f7;">🔒 COPIAR ID</span></td>
                     </tr>`;
                 tbody.innerHTML += row;
             });
