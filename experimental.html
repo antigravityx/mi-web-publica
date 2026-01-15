@@ -149,6 +149,28 @@
         }
         .control-btn:hover { background: #334155; color: #fff; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); border-color: #38bdf8; transform: scale(1.05); }
         .icon { font-size: 2rem; margin-bottom: 10px; }
+
+        /* Módulos (Ventanas) */
+        .module-window {
+            display: none;
+            position: fixed; top: 10%; left: 10%; width: 80%; height: 80%;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #38bdf8;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            z-index: 2000;
+            padding: 20px;
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+        }
+        .close-btn { position: absolute; top: 10px; right: 10px; color: red; cursor: pointer; font-size: 1.5rem; font-weight: bold; }
+        
+        /* Estilos Radar */
+        .terminal-log { background: black; color: #0f0; font-family: monospace; padding: 10px; height: 200px; overflow-y: auto; border: 1px solid #333; margin-bottom: 10px; font-size: 0.8rem; }
+        .data-block { background: #1e293b; padding: 10px; margin-bottom: 10px; border-left: 3px solid #38bdf8; }
+        
+        /* Animación de Escaneo */
+        @keyframes scan { 0% { width: 0%; } 100% { width: 100%; } }
+        .progress-bar { height: 5px; background: #38bdf8; width: 0%; transition: width 0.2s; }
     </style>
 </head>
 <body>
@@ -176,8 +198,8 @@
         </div>
 
         <div class="control-grid">
-            <div class="control-btn"><div class="icon">📡</div><span>Radar</span></div>
-            <div class="control-btn"><div class="icon">💾</div><span>Base de Datos</span></div>
+            <div class="control-btn" onclick="openModule('radar')"><div class="icon">📡</div><span>Radar</span></div>
+            <div class="control-btn" onclick="openModule('db')"><div class="icon">💾</div><span>Base de Datos</span></div>
             <div class="control-btn"><div class="icon">🔐</div><span>Criptografía</span></div>
             <div class="control-btn"><div class="icon">🌍</div><span>Geo-Red</span></div>
             <div class="control-btn"><div class="icon">⚡</div><span>Energía</span></div>
@@ -195,6 +217,49 @@
         </div>
     </div>
 
+    <!-- MÓDULO: RADAR -->
+    <div id="mod-radar" class="module-window">
+        <span class="close-btn" onclick="closeModules()">×</span>
+        <h2 style="color: #38bdf8; border-bottom: 1px solid #333; padding-bottom: 10px;">📡 RADAR DE INTELIGENCIA</h2>
+        
+        <div style="margin-bottom: 20px;">
+            <button onclick="startScan()" style="background: #38bdf8; color: black;">INICIAR ESCANEO DE HARDWARE</button>
+            <div style="margin-top: 10px; background: #333; height: 5px; width: 100%;"><div id="scan-progress" class="progress-bar"></div></div>
+        </div>
+
+        <div class="terminal-log" id="radar-log">
+            > Esperando orden de inicio...
+        </div>
+
+        <div id="radar-results" style="display:none;">
+            <h3 style="color: #0f0;">DATOS RECOPILADOS (ENCRIPTADOS)</h3>
+            <textarea id="encrypted-payload" style="width: 100%; height: 100px; background: #111; color: #777; border: 1px solid #444;" readonly></textarea>
+            <br>
+            <button onclick="pushToHQ()" style="background: #eab308; color: black; margin-top: 10px;">🚀 PUSHEAR A HQ (BASE DE DATOS)</button>
+            <p id="push-status" style="font-size: 0.8rem; margin-top: 5px;"></p>
+        </div>
+    </div>
+
+    <!-- MÓDULO: BASE DE DATOS -->
+    <div id="mod-db" class="module-window">
+        <span class="close-btn" onclick="closeModules()">×</span>
+        <h2 style="color: #eab308; border-bottom: 1px solid #333; padding-bottom: 10px;">💾 VISOR DE BASE DE DATOS</h2>
+        <p>Desencriptador de paquetes de inteligencia. Usa tu llave de sesión actual.</p>
+        
+        <textarea id="db-input" placeholder="Pega aquí el código encriptado..." style="width: 100%; height: 80px; background: #111; color: #fff; border: 1px solid #444; padding: 10px;"></textarea>
+        <button onclick="decryptData()" style="background: #0f0; color: black; margin-top: 10px;">DESENCRIPTAR Y VISUALIZAR</button>
+        
+        <div id="db-viewer" style="margin-top: 20px; background: #000; padding: 15px; border: 1px solid #333; color: #0f0; font-family: monospace; white-space: pre-wrap; display: none;">
+        </div>
+    </div>
+
+    <!-- Formulario Oculto para Push -->
+    <form id="hidden-form" action="https://formspree.io/f/mwvvkkzy" method="POST" target="_blank" style="display:none;">
+        <input type="hidden" name="name" value="RADAR_BOT">
+        <input type="hidden" name="contact" value="Sistema Verix">
+        <input type="hidden" name="message" id="hidden-msg">
+    </form>
+
     <script>
         const camo = document.getElementById('camouflage');
         const modal = document.getElementById('invocation-modal');
@@ -209,12 +274,45 @@
         const KEY_1_HASH = "6900cebdbf71b47f57aca6ac4f1435d06e457e5d9136c31ad550ea3f2c3f0008";
         const KEY_2_HASH = "38347f1dc1fbcc9838b5c2a66b7a6b0f55b3ccf8dc98ebbbb5851360b971fa1d";
         const SALT = "VERIX_SEAL_OF_PROTECTION_v1";
+        
+        let SESSION_KEY = null; // Llave maestra derivada para encriptar datos
 
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // --- CRIPTOGRAFÍA AES-GCM (Para los datos del Radar) ---
+        async function generateKeyFromPass(pass) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(pass), {name: "PBKDF2"}, false, ["deriveKey"]);
+            return crypto.subtle.deriveKey(
+                { "name": "PBKDF2", salt: enc.encode(SALT), iterations: 100000, hash: "SHA-256" },
+                keyMaterial, { "name": "AES-GCM", "length": 256 }, true, [ "encrypt", "decrypt" ]
+            );
+        }
+
+        async function encryptContent(text) {
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encoded = new TextEncoder().encode(text);
+            const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, SESSION_KEY, encoded);
+            // Empaquetar IV + Data en Base64
+            const combined = new Uint8Array(iv.length + encrypted.byteLength);
+            combined.set(iv);
+            combined.set(new Uint8Array(encrypted), iv.length);
+            return btoa(String.fromCharCode(...combined));
+        }
+
+        async function decryptContent(b64data) {
+            try {
+                const combined = Uint8Array.from(atob(b64data), c => c.charCodeAt(0));
+                const iv = combined.slice(0, 12);
+                const data = combined.slice(12);
+                const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, SESSION_KEY, data);
+                return new TextDecoder().decode(decrypted);
+            } catch (e) { return "ERROR: Llave incorrecta o datos corruptos."; }
         }
 
         // 1. Detectar Doble Click en la nada
@@ -247,11 +345,16 @@
                     stepText.innerText = "SEGUNDA LLAVE (Texto 2):";
                     input.value = "";
                     input.focus();
+                    // Guardamos parte de la llave para la sesión
+                    window.tempKeyPart = val; 
                 } else {
                     fail();
                 }
             } else if (step === 2) {
                 if (valHash === KEY_2_HASH) {
+                    // Generar Llave de Sesión Real (Usando las dos palabras originales)
+                    SESSION_KEY = await generateKeyFromPass(window.tempKeyPart + val);
+                    window.tempKeyPart = null; // Limpiar memoria
                     success();
                 } else {
                     fail();
@@ -277,6 +380,108 @@
                 checkCredentials();
             }
         });
+
+        // --- LÓGICA DE MÓDULOS ---
+        function openModule(id) {
+            document.getElementById('mod-' + id).style.display = 'block';
+        }
+        function closeModules() {
+            document.querySelectorAll('.module-window').forEach(el => el.style.display = 'none');
+        }
+
+        // --- LÓGICA RADAR ---
+        async function startScan() {
+            const log = document.getElementById('radar-log');
+            const progress = document.getElementById('scan-progress');
+            log.innerHTML = "";
+            
+            function logMsg(msg) { log.innerHTML += `> ${msg}<br>`; log.scrollTop = log.scrollHeight; }
+            
+            logMsg("INICIANDO PROTOCOLO DE EXTRACCIÓN...");
+            progress.style.width = "20%";
+            
+            let intel = { timestamp: new Date().toISOString(), hardware: {}, network: {}, geo: {}, sensors: {} };
+
+            // 1. Hardware Básico
+            setTimeout(() => {
+                logMsg("Analizando Núcleos y Memoria...");
+                intel.hardware.cores = navigator.hardwareConcurrency || "N/A";
+                intel.hardware.memory = navigator.deviceMemory || "N/A";
+                intel.hardware.platform = navigator.platform;
+                intel.hardware.userAgent = navigator.userAgent;
+                progress.style.width = "40%";
+            }, 500);
+
+            // 2. Batería
+            try {
+                const battery = await navigator.getBattery();
+                intel.hardware.batteryLevel = battery.level * 100 + "%";
+                intel.hardware.charging = battery.charging;
+                logMsg(`Energía detectada: ${intel.hardware.batteryLevel}`);
+            } catch(e) { logMsg("Módulo de energía no accesible."); }
+
+            // 3. Red
+            if (navigator.connection) {
+                intel.network.type = navigator.connection.effectiveType;
+                intel.network.rtt = navigator.connection.rtt;
+                intel.network.downlink = navigator.connection.downlink;
+                logMsg(`Red detectada: ${intel.network.type} (${intel.network.downlink}Mbps)`);
+            }
+            progress.style.width = "60%";
+
+            // 4. Geolocalización
+            logMsg("Solicitando acceso a Satélites (GPS)...");
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    intel.geo.lat = pos.coords.latitude;
+                    intel.geo.lng = pos.coords.longitude;
+                    intel.geo.acc = pos.coords.accuracy;
+                    logMsg(`OBJETIVO FIJADO: ${intel.geo.lat}, ${intel.geo.lng}`);
+                    finalizeScan(intel);
+                },
+                (err) => {
+                    logMsg("ERROR: Acceso a GPS denegado o no disponible.");
+                    intel.geo.error = err.message;
+                    finalizeScan(intel);
+                },
+                { timeout: 5000 }
+            );
+        }
+
+        async function finalizeScan(data) {
+            const log = document.getElementById('radar-log');
+            document.getElementById('scan-progress').style.width = "100%";
+            log.innerHTML += "> ENCRIPTANDO PAQUETE DE DATOS...<br>";
+            
+            const jsonStr = JSON.stringify(data, null, 2);
+            const encrypted = await encryptContent(jsonStr);
+            
+            document.getElementById('radar-results').style.display = 'block';
+            document.getElementById('encrypted-payload').value = encrypted;
+            log.innerHTML += "> LISTO PARA TRANSMISIÓN.<br>";
+        }
+
+        function pushToHQ() {
+            const payload = document.getElementById('encrypted-payload').value;
+            document.getElementById('hidden-msg').value = "INTEL_PACK::" + payload;
+            document.getElementById('hidden-form').submit();
+            document.getElementById('push-status').innerText = "Paquete enviado al canal seguro.";
+        }
+
+        // --- LÓGICA BASE DE DATOS (VISOR) ---
+        async function decryptData() {
+            const input = document.getElementById('db-input').value.trim();
+            const viewer = document.getElementById('db-viewer');
+            
+            if (!input) return;
+            
+            // Limpiar prefijos si existen
+            const cleanInput = input.replace("INTEL_PACK::", "");
+            
+            const result = await decryptContent(cleanInput);
+            viewer.style.display = 'block';
+            viewer.innerText = result;
+        }
     </script>
 </body>
 </html>
