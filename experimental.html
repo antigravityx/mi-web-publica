@@ -191,6 +191,30 @@
         /* Animación de Escaneo */
         @keyframes scan { 0% { width: 0%; } 100% { width: 100%; } }
         .progress-bar { height: 5px; background: #38bdf8; width: 0%; transition: width 0.2s; }
+
+        /* --- ESTILOS DASHBOARD TÁCTICO (NUEVO) --- */
+        .radar-dashboard { background: #0f172a; border: 1px solid #38bdf8; padding: 20px; border-radius: 8px; margin-top: 10px; animation: fadeIn 0.5s; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 10px; margin-bottom: 20px; }
+        .dashboard-header h3 { margin: 0; color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        .timestamp { color: #94a3b8; font-size: 0.8rem; font-family: monospace; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+        .dashboard-card { background: #1e293b; border: 1px solid #334155; border-radius: 6px; overflow: hidden; transition: transform 0.2s; }
+        .dashboard-card:hover { transform: translateY(-2px); border-color: #38bdf8; }
+        
+        .card-header { background: rgba(51, 65, 85, 0.5); color: #e2e8f0; padding: 10px 15px; font-weight: bold; display: flex; align-items: center; border-bottom: 1px solid #334155; }
+        .card-icon { margin-right: 10px; font-size: 1.2rem; }
+        .card-body { padding: 15px; font-size: 0.9rem; }
+        
+        .data-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #333; padding-bottom: 4px; }
+        .data-row:last-child { border-bottom: none; margin-bottom: 0; }
+        .label { color: #94a3b8; }
+        .value { color: #4ade80; font-family: monospace; font-weight: bold; text-align: right; }
+        .map-link { display: block; text-align: center; background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 8px; text-decoration: none; border: 1px solid #38bdf8; border-radius: 4px; margin-top: 10px; transition: all 0.2s; }
+        .map-link:hover { background: #38bdf8; color: #000; }
+        .ua-text { font-size: 0.75rem; color: #64748b; word-break: break-all; line-height: 1.4; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -256,6 +280,7 @@
             <textarea id="encrypted-payload" style="width: 100%; height: 100px; background: #111; color: #777; border: 1px solid #444;" readonly></textarea>
             <br>
             <button onclick="pushToHQ()" style="background: #eab308; color: black; margin-top: 10px;">🚀 PUSHEAR A HQ (BASE DE DATOS)</button>
+            <button onclick="transferToDB()" style="background: #38bdf8; color: black; margin-top: 10px; margin-left: 10px;">🔓 DECODIFICAR EN VISOR</button>
             <p id="push-status" style="font-size: 0.8rem; margin-top: 5px;"></p>
         </div>
     </div>
@@ -318,7 +343,7 @@
         const KEY_1_HASH = "6900cebdbf71b47f57aca6ac4f1435d06e457e5d9136c31ad550ea3f2c3f0008";
         const KEY_2_HASH = "38347f1dc1fbcc9838b5c2a66b7a6b0f55b3ccf8dc98ebbbb5851360b971fa1d";
         const SALT = "VERIX_SEAL_OF_PROTECTION_v1";
-        const CAPSULES_DB = [{"id": "2394F75B", "name": "soul_backup_20260112_1952.vx", "filename": "soul_backup_20260112_1952.vx", "date": "2026-01-12 19:52:00", "size": "0.02 MB"}, {"id": "7E205460", "name": "soul_backup_20260112_2103.vx", "filename": "soul_backup_20260112_2103.vx", "date": "2026-01-12 21:03:37", "size": "0.03 MB"}];
+        const CAPSULES_DB = [{"id": "2394F75B", "name": "soul_backup_20260112_1952.vx", "filename": "soul_backup_20260112_1952.vx", "date": "2026-01-12 19:52:00", "size": "0.02 MB"}, {"id": "7E205460", "name": "soul_backup_20260112_2103.vx", "filename": "soul_backup_20260112_2103.vx", "date": "2026-01-12 21:03:37", "size": "0.03 MB"}, {"id": "7E49C8EF", "name": "actualwebpublica", "filename": "soul_backup_20260114_2321_actualwebpublica.vx", "date": "2026-01-14 23:21:06", "size": "0.13 MB"}];
         
         let SESSION_KEY = null; // Llave maestra derivada para encriptar datos
 
@@ -514,6 +539,14 @@
             document.getElementById('push-status').innerText = "Paquete enviado al canal seguro.";
         }
 
+        function transferToDB() {
+            const encrypted = document.getElementById('encrypted-payload').value;
+            if (!encrypted) return;
+            document.getElementById('db-input').value = encrypted;
+            openModule('db');
+            decryptData(); // Auto-ejecutar desencriptado
+        }
+
         // --- LÓGICA BASE DE DATOS (VISOR) ---
         async function decryptData() {
             const input = document.getElementById('db-input').value.trim();
@@ -531,10 +564,75 @@
             // Intentar formatear JSON si es posible
             try {
                 const json = JSON.parse(result);
-                viewer.innerHTML = '<div class="json-container">' + formatJSON(json) + '</div>';
+                
+                // DETECCIÓN INTELIGENTE: ¿Es un reporte de Radar?
+                if (json.hardware && json.network && json.geo) {
+                    viewer.innerHTML = renderRadarDashboard(json);
+                } else {
+                    // JSON genérico
+                    viewer.innerHTML = '<div class="json-container">' + formatJSON(json) + '</div>';
+                }
             } catch (e) {
                 viewer.innerText = result; // Si no es JSON, mostrar texto plano
             }
+        }
+
+        // --- RENDERIZADO AVANZADO (DASHBOARD TÁCTICO) ---
+        function renderRadarDashboard(data) {
+            const card = (title, icon, content) => `
+                <div class="dashboard-card">
+                    <div class="card-header"><span class="card-icon">${icon}</span> ${title}</div>
+                    <div class="card-body">${content}</div>
+                </div>`;
+
+            // Hardware
+            const hw = data.hardware || {};
+            const hwContent = `
+                <div class="data-row"><span class="label">CPU Cores:</span> <span class="value">${hw.cores || '?'}</span></div>
+                <div class="data-row"><span class="label">RAM:</span> <span class="value">${hw.memory ? hw.memory + ' GB' : '?'}</span></div>
+                <div class="data-row"><span class="label">OS:</span> <span class="value">${hw.platform || '?'}</span></div>
+                <div class="data-row"><span class="label">Batería:</span> <span class="value">${hw.batteryLevel || 'N/A'} ${hw.charging ? '⚡' : ''}</span></div>
+            `;
+
+            // Network
+            const net = data.network || {};
+            const netContent = `
+                <div class="data-row"><span class="label">Conexión:</span> <span class="value">${net.type || 'Unknown'}</span></div>
+                <div class="data-row"><span class="label">Bajada:</span> <span class="value">${net.downlink ? net.downlink + ' Mbps' : '?'}</span></div>
+                <div class="data-row"><span class="label">Ping (RTT):</span> <span class="value">${net.rtt ? net.rtt + ' ms' : '?'}</span></div>
+            `;
+
+            // Geo
+            const geo = data.geo || {};
+            let geoContent = `<div style="color:#ef4444;">Sin señal GPS</div>`;
+            if (geo.lat && geo.lng) {
+                geoContent = `
+                    <div class="data-row"><span class="label">Lat:</span> <span class="value">${geo.lat.toFixed(4)}</span></div>
+                    <div class="data-row"><span class="label">Lng:</span> <span class="value">${geo.lng.toFixed(4)}</span></div>
+                    <div class="data-row"><span class="label">Precisión:</span> <span class="value">±${geo.acc || 0}m</span></div>
+                    <a href="https://www.google.com/maps?q=${geo.lat},${geo.lng}" target="_blank" class="map-link">🗺️ ABRIR MAPA TÁCTICO</a>
+                `;
+            } else if (geo.error) {
+                geoContent = `<div style="color:#ef4444; font-size:0.8rem;">${geo.error}</div>`;
+            }
+
+            // System / User Agent
+            const sysContent = `<div class="ua-text">${hw.userAgent || 'Desconocido'}</div>`;
+
+            return `
+                <div class="radar-dashboard">
+                    <div class="dashboard-header">
+                        <h3>📡 INTELIGENCIA DE OBJETIVO</h3>
+                        <span class="timestamp">T: ${data.timestamp || 'UNKNOWN'}</span>
+                    </div>
+                    <div class="dashboard-grid">
+                        ${card('HARDWARE', '💻', hwContent)}
+                        ${card('RED / ENLACE', '🌐', netContent)}
+                        ${card('GEOLOCALIZACIÓN', '🛰️', geoContent)}
+                        ${card('HUELLA DIGITAL', '👣', sysContent)}
+                    </div>
+                </div>
+            `;
         }
 
         // --- UTILIDAD: FORMATO JSON ---
