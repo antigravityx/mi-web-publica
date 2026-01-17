@@ -105,7 +105,7 @@
     <p style="font-size:0.9em;">Acceso remoto detectado. Verificación requerida.</p>
     
     <!-- Anti-Bot Check -->
-    <div style="margin: 20px 0; padding: 15px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; display: inline-block;">
+    <div id="auth-container" style="margin: 20px 0; padding: 15px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; display: inline-block;">
         <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #334155;">
             <input type="checkbox" id="humanCheck" onchange="toggleAuth()" style="width: 20px; height: 20px; margin-right: 10px; accent-color: #10b981;">
             🤖 No soy un robot
@@ -124,7 +124,7 @@
     </div>
 
     <div id="cloud-warning" style="display:none; margin-top:15px; border-top:1px dashed #e11d48; padding-top:10px;">
-        ⚠️ <b>MODO NUBE (SOLO LECTURA)</b><br>
+        ⚠️ <b>ESTÁS EN LA WEB PÚBLICA</b><br>
         Para usar el motor, accede vía LAN.<br>
     
     <div style="margin-top:15px; background:white; padding:10px; display:inline-block; border-radius:10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -191,8 +191,9 @@
             
             if (isCloud) {
                 document.getElementById('cloud-warning').style.display = 'block';
-                // En nube pública no hay forma de conectar, así que ocultamos el login
-                document.getElementById('humanCheck').disabled = true;
+                // Ocultar controles de login porque no sirven en la nube pública
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('auth-fields').style.display = 'none';
             }
         }
     });
