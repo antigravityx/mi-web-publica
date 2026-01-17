@@ -100,9 +100,32 @@
     <p>Motor de extracción de medios. Sin publicidad. Privado.</p>
 </div>
 
-<div id="local-warning" style="display:none; background: #fee2e2; color: #b91c1c; padding: 15px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ef4444; text-align: center; max-width: 600px; margin: 0 auto 20px auto;">
-    ⚠️ <b>MODO NUBE (SOLO LECTURA)</b><br>
-    GitHub Pages es un "Espejo Estático". Para usar el Motor (Python), accede a tu <b>Núcleo Verix</b>.<br>
+<div id="remote-gate" style="display:none; background: #fff1f2; color: #881337; padding: 20px; margin-bottom: 20px; border-radius: 12px; border: 2px solid #e11d48; text-align: center; max-width: 600px; margin: 0 auto 20px auto; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.15);">
+    <h3 style="margin-top:0;">🛡️ PROTOCOLO DE SEGURIDAD</h3>
+    <p style="font-size:0.9em;">Acceso remoto detectado. Verificación requerida.</p>
+    
+    <!-- Anti-Bot Check -->
+    <div style="margin: 20px 0; padding: 15px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; display: inline-block;">
+        <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #334155;">
+            <input type="checkbox" id="humanCheck" onchange="toggleAuth()" style="width: 20px; height: 20px; margin-right: 10px; accent-color: #10b981;">
+            🤖 No soy un robot
+        </label>
+    </div>
+
+    <!-- Password Field (Hidden) -->
+    <div id="auth-fields" style="display:none; margin-top: 10px;">
+        <input type="password" id="accessKey1" placeholder="Texto Sagrado 1" 
+            style="padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; width: 200px; text-align: center; margin-bottom: 5px;">
+        <br>
+        <input type="password" id="accessKey2" placeholder="Texto Sagrado 2" 
+            style="padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; width: 200px; text-align: center;">
+        <br><br>
+        <button onclick="authorizeRemote()" class="btn" style="background: #be123c; padding: 8px 20px; font-size: 0.9em;">🔓 HABILITAR SISTEMA</button>
+    </div>
+
+    <div id="cloud-warning" style="display:none; margin-top:15px; border-top:1px dashed #e11d48; padding-top:10px;">
+        ⚠️ <b>MODO NUBE (SOLO LECTURA)</b><br>
+        Para usar el motor, accede vía LAN.<br>
     
     <div style="margin-top:15px; background:white; padding:10px; display:inline-block; border-radius:10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://192.168.0.54:8000/downloader.html" alt="Scan Me">
@@ -110,9 +133,10 @@
     </div><br>
     <small style="font-size:1em;">O accede manualmente: <b>http://192.168.0.54:8000</b></small>
         
+    </div>
 </div>
 
-<div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;">
+<div id="main-interface" style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; transition: opacity 0.3s;">
     <div style="margin-bottom: 30px;">
         <input type="text" id="videoUrl" placeholder="Pega el enlace aquí (YouTube, TikTok, X...)" 
             style="width: 100%; padding: 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1.1em; outline: none; transition: border 0.3s;">
@@ -146,15 +170,52 @@
 </style>
 
 <script>
+    let remoteKey1 = "";
+    let remoteKey2 = "";
+
     document.addEventListener('DOMContentLoaded', function() {
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isCloud = window.location.hostname.includes('github.io') || window.location.hostname.includes('netlify.app');
+        
         if (!isLocal) {
-            document.getElementById('local-warning').style.display = 'block';
-            document.getElementById('dlBtn').disabled = true;
-            document.getElementById('dlBtn').style.opacity = "0.5";
-            document.getElementById('dlBtn').innerText = "Solo disponible en Localhost";
+            // Activar Puerta de Seguridad
+            document.getElementById('remote-gate').style.display = 'block';
+            
+            // Bloquear interfaz principal
+            const main = document.getElementById('main-interface');
+            main.style.opacity = '0.3';
+            main.style.pointerEvents = 'none';
+            
+            if (isCloud) {
+                document.getElementById('cloud-warning').style.display = 'block';
+                // En nube pública no hay forma de conectar, así que ocultamos el login
+                document.getElementById('humanCheck').disabled = true;
+            }
         }
     });
+
+    function toggleAuth() {
+        const check = document.getElementById('humanCheck');
+        const fields = document.getElementById('auth-fields');
+        fields.style.display = check.checked ? 'block' : 'none';
+    }
+
+    function authorizeRemote() {
+        const k1 = document.getElementById('accessKey1').value;
+        const k2 = document.getElementById('accessKey2').value;
+        if (!k1 || !k2) return alert("Ingresa ambos textos sagrados.");
+        
+        remoteKey1 = k1;
+        remoteKey2 = k2;
+        
+        // Desbloquear UI
+        const main = document.getElementById('main-interface');
+        main.style.opacity = '1';
+        main.style.pointerEvents = 'auto';
+        
+        // Ocultar puerta
+        document.getElementById('remote-gate').style.display = 'none';
+    }
 
     async function processDownload() {
         const url = document.getElementById('videoUrl').value;
@@ -180,7 +241,7 @@
             const response = await fetch('/api/download', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({url: url, format: fmt})
+                body: JSON.stringify({url: url, format: fmt, key1: remoteKey1, key2: remoteKey2})
             });
             
             const data = await response.json();
