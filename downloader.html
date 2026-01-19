@@ -97,45 +97,42 @@
         
 <div class="hero" style="background: linear-gradient(to right, #fee2e2, #fecaca);">
     <h2 style="color: #b91c1c;">Conversor Universal</h2>
-    <p>Motor de extracción de medios. Sin publicidad. Privado.</p>
+    <p>Motor de extracción de medios. Privado y Seguro.</p>
 </div>
 
-<div id="remote-gate" style="display:none; background: #fff1f2; color: #881337; padding: 20px; margin-bottom: 20px; border-radius: 12px; border: 2px solid #e11d48; text-align: center; max-width: 600px; margin: 0 auto 20px auto; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.15);">
-    <h3 style="margin-top:0;">🛡️ PROTOCOLO DE SEGURIDAD</h3>
-    <p style="font-size:0.9em;">Acceso remoto detectado. Verificación requerida.</p>
+<!-- PUERTA DE SEGURIDAD (SOLO VISIBLE SI NO ES LOCALHOST) -->
+<div id="remote-gate" style="display:none; max-width: 500px; margin: 0 auto 30px auto;">
     
-    <!-- Anti-Bot Check -->
-    <div id="auth-container" style="margin: 20px 0; padding: 15px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; display: inline-block;">
-        <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #334155;">
-            <input type="checkbox" id="humanCheck" onchange="toggleAuth()" style="width: 20px; height: 20px; margin-right: 10px; accent-color: #10b981;">
-            🤖 No soy un robot
-        </label>
+    <!-- CASO 1: ESTAMOS EN LA NUBE (GITHUB) -->
+    <div id="cloud-interface" style="display:none;">
+        
+    <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <h3 style="color: #1e293b; margin-top: 0;">📡 Conexión con Núcleo Verix</h3>
+        <p style="color: #64748b; font-size: 0.9em;">
+            Para procesar descargas, esta web debe conectarse con tu PC.<br>
+            Asegúrate de que tu <b>Servidor Verix</b> esté encendido (Opción 2->1).
+        </p>
+        <a href="http://192.168.0.54:8000/downloader.html" class="btn" style="background: #2563eb; color: white; text-decoration: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; display: inline-block; margin-top: 10px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);">
+            🔗 ACCEDER AL CONVERSOR (USAR PC COMO SERVIDOR)
+        </a>
+    </div>
+    
     </div>
 
-    <!-- Password Field (Hidden) -->
-    <div id="auth-fields" style="display:none; margin-top: 10px;">
+    <!-- CASO 2: ESTAMOS EN LAN (IP LOCAL) -> PEDIR CLAVES -->
+    <div id="auth-interface" style="display:none; background: #fff1f2; color: #881337; padding: 30px; border-radius: 12px; border: 2px solid #e11d48; text-align: center; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.15);">
+        <h3 style="margin-top:0; color: #be123c;">🛡️ ACCESO BLINDADO</h3>
+        <p style="font-size:0.9em; margin-bottom: 20px;">Identifícate con los Textos Sagrados.</p>
+        
         <input type="password" id="accessKey1" placeholder="Texto Sagrado 1" 
-            style="padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; width: 200px; text-align: center; margin-bottom: 5px;">
+            style="padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; width: 80%; text-align: center; margin-bottom: 10px; font-size: 1em;">
         <br>
         <input type="password" id="accessKey2" placeholder="Texto Sagrado 2" 
-            style="padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; width: 200px; text-align: center;">
+            style="padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; width: 80%; text-align: center; font-size: 1em;">
         <br><br>
-        <button onclick="authorizeRemote()" class="btn" style="background: #be123c; padding: 8px 20px; font-size: 0.9em;">🔓 HABILITAR SISTEMA</button>
-    </div>
-
-    <div id="cloud-warning" style="display:none; margin-top:15px; border-top:1px dashed #e11d48; padding-top:10px;">
-        ⚠️ <b>ESTÁS EN LA WEB PÚBLICA</b><br>
-        Para usar el motor, accede vía LAN.<br>
-    
-    <div style="margin-top:15px; background:white; padding:10px; display:inline-block; border-radius:10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://192.168.0.54:8000/downloader.html" alt="Scan Me">
-        <div style="font-size:0.8em; color:#333; margin-top:5px;">Escanear para Móvil</div>
-    </div><br>
-    <div style="margin-top: 20px; padding: 10px; background: rgba(255,255,255,0.5); border-radius: 8px;">
-        <p style="font-size: 0.85em; color: #b91c1c; margin: 0 0 10px 0;">⚠️ <b>REQUISITO:</b> Tu Servidor Verix (PC) debe estar ENCENDIDO.</p>
-        <a href="http://192.168.0.54:8000/downloader.html" class="btn" style="background: #334155; color: white; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-size: 0.9em; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">🔗 CONECTAR MANUALMENTE</a>
-    </div>
-        
+        <button onclick="authorizeRemote()" class="btn" style="background: #be123c; padding: 12px 30px; font-size: 1em; border: none; cursor: pointer; color: white; border-radius: 8px; font-weight: bold;">
+            🔓 DESBLOQUEAR MOTOR
+        </button>
     </div>
 </div>
 
@@ -272,7 +269,7 @@
 
     </main>
     <footer>
-        <p>&copy; 2026 r1ch0n & Verix Systems</p>
+        <p>&copy; 2026 richonbroo & Verix Systems</p>
     </footer>
 </body>
 </html>
