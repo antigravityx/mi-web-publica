@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECTOR ADMINISTRATIVO | Verix</title>
+    <style>
+        body { background-color: #020617; color: #38bdf8; font-family: 'Courier New', monospace; padding: 20px; max-width: 600px; margin: 0 auto; }
+        #chat-box { height: 300px; border: 1px solid #1e293b; padding: 10px; overflow-y: auto; margin-bottom: 20px; background: #0f172a; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .msg { margin-bottom: 10px; }
+        .msg.user { color: #38bdf8; text-align: right; }
+        .msg.verix { color: #4ade80; text-align: left; }
+        input, button { width: 100%; padding: 10px; margin-bottom: 10px; background: #1e293b; border: 1px solid #334155; color: white; font-family: monospace; }
+        button { cursor: pointer; background: #0ea5e9; color: white; font-weight: bold; border: none; }
+        button:hover { background: #0284c7; }
+        .hidden-auth { display: none; border: 1px solid #ef4444; padding: 10px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center; border-bottom: 1px solid #334155; padding-bottom: 10px; color: #e2e8f0;">🛡️ SECTOR ADMINISTRATIVO</h2>
+    
+    <div id="connection-setup" style="margin-bottom: 20px; font-size: 0.8em; color: #94a3b8;">
+        <label>📡 COORDENADAS DEL PALACIO (IP:PUERTO):</label>
+        <input type="text" id="server-ip" placeholder="Ej: 201.18.xx.xx:8000" value="152.168.13.153:8000" style="color: #cbd5e1; border-color: #475569;">
+    </div>
+
+    <div id="auth-box" class="hidden-auth" style="display:block;">
+        <p style="color: #f87171; margin: 0 0 10px 0;">🔒 PROTOCOLO DE FIRMA DIGITAL</p>
+        <input type="password" id="k1" placeholder="Primer Texto Sagrado">
+        <input type="password" id="k2" placeholder="Segundo Texto Sagrado">
+    </div>
+
+    <div id="chat-box">
+        <div class="msg verix">> SISTEMA: Esperando solicitud de audiencia con el Rey...</div>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="msg-input" placeholder="Mensaje para Verix..." onkeypress="if(event.key==='Enter') sendMsg()">
+        <button onclick="sendMsg()" style="width: auto;">LLAMAR</button>
+    </div>
+
+    <script>
+        if(localStorage.getItem('verix_ip')) document.getElementById('server-ip').value = localStorage.getItem('verix_ip');
+
+        async function sendMsg() {
+            const ip = document.getElementById('server-ip').value;
+            const k1 = document.getElementById('k1').value;
+            const k2 = document.getElementById('k2').value;
+            const msgInput = document.getElementById('msg-input');
+            const msg = msgInput.value;
+            const chatBox = document.getElementById('chat-box');
+
+            if (!msg) return;
+            if (!k1 || !k2) { alert("Necesitas las llaves sagradas."); return; }
+
+            localStorage.setItem('verix_ip', ip);
+            chatBox.innerHTML += `<div class="msg user">${msg}</div>`;
+            msgInput.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            let protocol = "http://";
+            if (ip.startsWith("http")) protocol = "";
+
+            try {
+                const response = await fetch(`${protocol}${ip}/api/chat`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: msg, key1: k1, key2: k2 })
+                });
+                const data = await response.json();
+                if (data.status === 'ok') {
+                    chatBox.innerHTML += `<div class="msg verix">> ${data.reply}</div>`;
+                    document.getElementById('auth-box').style.display = 'none';
+                } else {
+                    chatBox.innerHTML += `<div class="msg verix" style="color:red;">> ${data.message}</div>`;
+                }
+            } catch (e) {
+                chatBox.innerHTML += `<div class="msg verix" style="color:red;">> ERROR DE ENLACE: No se encuentra el núcleo en ${ip}.</div>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
