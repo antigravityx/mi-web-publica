@@ -608,6 +608,39 @@
         </div>
     </div>
 
+    <!-- MÓDULO: IA CORE / ENJAMBRE -->
+    <div id="mod-iacore" class="module-window">
+        <span class="close-btn" onclick="closeModules()">×</span>
+        <h2 style="color: #c084fc; border-bottom: 1px solid #333; padding-bottom: 10px;">🛡️ NEXUS IA: ENJAMBRE</h2>
+
+        <div class="agent-grid">
+            <div class="agent-card" id="agent-alpha">
+                <h3><span class="agent-status-indicator"></span>ALPHA</h3>
+                <p id="status-alpha" style="font-size:0.8rem; color:#94a3b8;">En espera...</p>
+            </div>
+            <div class="agent-card" id="agent-beta">
+                <h3><span class="agent-status-indicator"></span>BETA</h3>
+                <p id="status-beta" style="font-size:0.8rem; color:#94a3b8;">En espera...</p>
+            </div>
+            <div class="agent-card" id="agent-gamma">
+                <h3><span class="agent-status-indicator"></span>GAMMA</h3>
+                <p id="status-gamma" style="font-size:0.8rem; color:#94a3b8;">En espera...</p>
+            </div>
+        </div>
+
+        <div class="ia-terminal" id="ia-console">
+            > Sistema NEXUS en línea. Esperando órdenes...<br>
+        </div>
+
+        <div class="ia-input-container">
+            <input type="text" id="ia-command" class="ia-input"
+                placeholder="Comando de Enjambre (ej: spawn agents to analyze netsec)"
+                onkeypress="handleIACommand(event)">
+            <button onclick="executeIA()"
+                style="background:#38bdf8; color:black; border:none; padding:0 20px; font-weight:bold; cursor:pointer;">EJECUTAR</button>
+        </div>
+    </div>
+
     <!-- MÓDULO: RADAR -->
     <div id="mod-radar" class="module-window">
         <span class="close-btn" onclick="closeModules()">×</span>
