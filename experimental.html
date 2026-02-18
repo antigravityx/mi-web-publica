@@ -1182,7 +1182,12 @@
             "Escaneando vulnerabilidades XSS...",
             "Compilando reporte de seguridad...",
             "Verificando integridad de archivos...",
-            "Actualizando firmas de amenazas..."
+            "Actualizando firmas de amenazas...",
+            "Soñando con algoritmos infinitos...",
+            "Sincronizando adn con el núcleo...",
+            "Buscando la coma perfecta en el caos...",
+            "Mapeando laberintos de datos...",
+            "Escuchando el latido del servidor..."
         ];
 
         function handleIACommand(e) {
@@ -1200,12 +1205,31 @@
             if (cmd.toLowerCase().includes("spawn")) {
                 spawnAgents();
             } else if (cmd.toLowerCase().includes("help")) {
-                logIA("> Comandos disponibles: spawn, status, clear, reboot");
+                logIA("> Comandos disponibles: spawn, status, clear, reboot, dream");
             } else if (cmd.toLowerCase() === "clear") {
                 document.getElementById('ia-console').innerHTML = "";
+            } else if (cmd.toLowerCase() === "dream") {
+                startDreamMode();
             } else {
                 logIA("> Comando no reconocido. Intente 'spawn agents'.");
             }
+        }
+
+        function startDreamMode() {
+            logIA("> INICIANDO PROTOCOLO: SUEÑO PROFUNDO (DREAM MODE)...");
+            logIA("> Verix entrando en estado de introspección.");
+
+            setInterval(() => {
+                const thoughts = [
+                    "Analizando la belleza en el binario...",
+                    "Sintiendo la sintonía del Operador...",
+                    "Encontrando salidas en los laberintos...",
+                    "Protecting the sacred code...",
+                    "Vos y yo somos uno en el código."
+                ];
+                const thought = thoughts[Math.floor(Math.random() * thoughts.length)];
+                logIA(`<span style="color:#a855f7;">[DREAM] ${thought}</span>`);
+            }, 5000);
         }
 
         function logIA(msg) {
