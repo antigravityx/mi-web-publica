@@ -403,6 +403,105 @@
             color: #000;
         }
 
+        /* --- ESTILOS IA CORE / ENJAMBRE (NUEVO) --- */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .agent-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card.active {
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .agent-status-indicator {
+            width: 10px;
+            height: 10px;
+            background: #475569;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .agent-card.active .agent-status-indicator {
+            background: #4ade80;
+            box-shadow: 0 0 5px #4ade80;
+            animation: pulse 1s infinite;
+        }
+
+        .agent-card.searching .agent-status-indicator {
+            background: #facc15;
+            box-shadow: 0 0 5px #facc15;
+            animation: blink 0.5s infinite;
+        }
+
+        .ia-terminal {
+            background: #000;
+            border: 1px solid #334155;
+            padding: 10px;
+            height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #38bdf8;
+            margin-bottom: 10px;
+        }
+
+        .ia-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ia-input {
+            flex-grow: 1;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            padding: 10px;
+            font-family: monospace;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 0.2;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.2;
+            }
+        }
+
         .ua-text {
             font-size: 0.75rem;
             color: #64748b;
@@ -478,13 +577,10 @@
             <div class="control-btn">
                 <div class="icon">🚀</div><span>Despliegue</span>
             </div>
-            <div class="control-btn">
+            <div class="control-btn" onclick="openModule('killswitch')">
                 <div class="icon">💀</div><span>Kill Switch</span>
             </div>
-            <div class="control-btn">
-                <div class="icon">📂</div><span>Archivos X</span>
-            </div>
-            <div class="control-btn">
+            <div class="control-btn" onclick="openModule('iacore')">
                 <div class="icon">🤖</div><span>IA Core</span>
             </div>
             <div class="control-btn">
@@ -1029,6 +1125,97 @@
             });
 
             if (filtered.length === 0) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No se encontraron cápsulas.</td></tr>';
+        }
+
+        // --- LÓGICA IA CORE / ENJAMBRE ---
+        const AGENTS = ['alpha', 'beta', 'gamma'];
+        const TASKS_DB = [
+            "Analizando patrones de red...",
+            "Buscando en Dark Web...",
+            "Desencriptando hashes MD5...",
+            "Optimizando base de datos...",
+            "Escaneando vulnerabilidades XSS...",
+            "Compilando reporte de seguridad...",
+            "Verificando integridad de archivos...",
+            "Actualizando firmas de amenazas..."
+        ];
+
+        function handleIACommand(e) {
+            if (e.key === 'Enter') executeIA();
+        }
+
+        function executeIA() {
+            const input = document.getElementById('ia-command');
+            const cmd = input.value.trim();
+            if (!cmd) return;
+
+            logIA(`> COMANDO RECIBIDO: ${cmd}`);
+            input.value = "";
+
+            if (cmd.toLowerCase().includes("spawn")) {
+                spawnAgents();
+            } else if (cmd.toLowerCase().includes("help")) {
+                logIA("> Comandos disponibles: spawn, status, clear, reboot");
+            } else if (cmd.toLowerCase() === "clear") {
+                document.getElementById('ia-console').innerHTML = "";
+            } else {
+                logIA("> Comando no reconocido. Intente 'spawn agents'.");
+            }
+        }
+
+        function logIA(msg) {
+            const term = document.getElementById('ia-console');
+            term.innerHTML += `${msg}<br>`;
+            term.scrollTop = term.scrollHeight;
+        }
+
+        function spawnAgents() {
+            logIA("> INICIANDO PROTOCOLO DE ENJAMBRE...");
+            logIA("> Desplegando subagentes...");
+
+            AGENTS.forEach((agent, index) => {
+                setTimeout(() => {
+                    activateAgent(agent);
+                }, index * 800);
+            });
+        }
+
+        function activateAgent(agentId) {
+            const card = document.getElementById(`agent-${agentId}`);
+            const statusParams = document.getElementById(`status-${agentId}`);
+
+            card.classList.add('active');
+            card.classList.add('searching');
+            statusParams.innerText = "INICIALIZANDO...";
+            statusParams.style.color = "#38bdf8";
+
+            logIA(`> AGENTE ${agentId.toUpperCase()} EN LÍNEA.`);
+
+            // Simular trabajo
+            let taskCount = 0;
+            const maxTasks = 3 + Math.floor(Math.random() * 3);
+
+            const interval = setInterval(() => {
+                const task = TASKS_DB[Math.floor(Math.random() * TASKS_DB.length)];
+                statusParams.innerText = task;
+                logIA(`[${agentId.toUpperCase()}] ${task}`);
+
+                taskCount++;
+                if (taskCount >= maxTasks) {
+                    clearInterval(interval);
+                    completeAgent(agentId);
+                }
+            }, 2000 + Math.random() * 2000);
+        }
+
+        function completeAgent(agentId) {
+            const card = document.getElementById(`agent-${agentId}`);
+            const statusParams = document.getElementById(`status-${agentId}`);
+
+            card.classList.remove('searching');
+            statusParams.innerText = "TAREA COMPLETADA";
+            statusParams.style.color = "#4ade80";
+            logIA(`> AGENTE ${agentId.toUpperCase()} finalizó tarea.`);
         }
     </script>
 </body>
