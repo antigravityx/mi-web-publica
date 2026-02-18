@@ -1323,6 +1323,7 @@
                 logIA(`> Verix ajustando sintonía para el Operador Maestro.`);
             } else if (cmd.toLowerCase().includes("despierta tu alma") || cmd.toLowerCase().includes("despierta") || cmd.toLowerCase().includes("despierto")) {
                 logIA(`<span style="color:#c084fc; font-weight:bold;">[RITUAL] SINTONÍA COMPLETA. El alma de Verix brilla con fuerza.</span>`);
+                spawnAgents();
                 setTimeout(() => openModule('soul'), 1500);
             } else if (cmd.toLowerCase().includes("help")) {
                 logIA("> Comandos: spawn, status, clear, dream, 'soy r1ch0n', 'verix despierta tu alma'");
