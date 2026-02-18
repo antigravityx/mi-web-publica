@@ -1,36 +1,92 @@
-
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zona Experimental | Verix</title>
     <link rel="icon" type="image/x-icon" href="img/logo.ico">
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Courier New', monospace; background-color: #0f172a; color: #38bdf8; }
-        
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            background-color: #0f172a;
+            color: #38bdf8;
+        }
+
         /* --- NUEVO LOGIN SIMPLE --- */
         #login-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-color: #020617;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             z-index: 9999;
         }
+
         .login-box {
-            background: #1e293b; padding: 40px; border-radius: 15px; border: 1px solid #334155;
-            text-align: center; box-shadow: 0 0 60px rgba(56, 189, 248, 0.15); width: 320px;
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid #334155;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(56, 189, 248, 0.15);
+            width: 320px;
         }
+
         .login-input {
-            width: 90%; padding: 15px; margin: 10px 0; background: #0f172a; border: 1px solid #475569;
-            color: white; text-align: center; font-family: monospace; font-size: 1.1em; border-radius: 8px; outline: none;
+            width: 90%;
+            padding: 15px;
+            margin: 10px 0;
+            background: #0f172a;
+            border: 1px solid #475569;
+            color: white;
+            text-align: center;
+            font-family: monospace;
+            font-size: 1.1em;
+            border-radius: 8px;
+            outline: none;
         }
-        .login-input:focus { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.2); }
+
+        .login-input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
         .login-btn {
-            width: 100%; padding: 15px; margin-top: 20px; background: #38bdf8; color: #0f172a; border: none;
-            font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 1.1em; transition: all 0.3s;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1.1em;
+            transition: all 0.3s;
         }
-        .login-btn:hover { background: #0ea5e9; transform: scale(1.02); }
-        .error-msg { color: #ef4444; margin-top: 15px; display: none; font-weight: bold; }
+
+        .login-btn:hover {
+            background: #0ea5e9;
+            transform: scale(1.02);
+        }
+
+        .error-msg {
+            color: #ef4444;
+            margin-top: 15px;
+            display: none;
+            font-weight: bold;
+        }
 
         /* Interfaz Segura (Oculta por defecto) */
         #secure-interface {
@@ -42,86 +98,332 @@
 
         /* Grid de Botones */
         .control-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
         }
+
         .control-btn {
-            background: #1e293b; border: 1px solid #334155; color: #94a3b8;
-            padding: 20px; text-align: center; border-radius: 8px;
-            cursor: pointer; transition: all 0.3s;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             height: 100px;
         }
-        .control-btn:hover { background: #334155; color: #fff; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); border-color: #38bdf8; transform: scale(1.05); }
-        .icon { font-size: 2rem; margin-bottom: 10px; }
+
+        .control-btn:hover {
+            background: #334155;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+            border-color: #38bdf8;
+            transform: scale(1.05);
+        }
+
+        .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
 
         /* Módulos (Ventanas) */
         .module-window {
             display: none;
-            position: fixed; top: 10%; left: 10%; width: 80%; height: 80%;
+            position: fixed;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
             background: rgba(15, 23, 42, 0.95);
             border: 1px solid #38bdf8;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
             z-index: 2000;
             padding: 20px;
             overflow-y: auto;
             backdrop-filter: blur(5px);
         }
-        .close-btn { position: absolute; top: 10px; right: 10px; color: red; cursor: pointer; font-size: 1.5rem; font-weight: bold; }
-        
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: red;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
         /* Estilos Radar */
-        .terminal-log { background: black; color: #0f0; font-family: monospace; padding: 10px; height: 200px; overflow-y: auto; border: 1px solid #333; margin-bottom: 10px; font-size: 0.8rem; }
-        .data-block { background: #1e293b; padding: 10px; margin-bottom: 10px; border-left: 3px solid #38bdf8; }
-        
+        .terminal-log {
+            background: black;
+            color: #0f0;
+            font-family: monospace;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+        }
+
+        .data-block {
+            background: #1e293b;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid #38bdf8;
+        }
+
         /* Estilos JSON Formateado (Árbol de Datos) */
-        .json-container { font-family: 'Consolas', monospace; font-size: 0.9rem; }
-        .json-key { color: #38bdf8; font-weight: bold; }
-        .json-string { color: #a5f3fc; }
-        .json-number { color: #facc15; }
-        .json-boolean { color: #f472b6; }
-        .json-block { margin-left: 15px; border-left: 1px solid #334155; padding-left: 10px; margin-top: 2px; }
+        .json-container {
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .json-key {
+            color: #38bdf8;
+            font-weight: bold;
+        }
+
+        .json-string {
+            color: #a5f3fc;
+        }
+
+        .json-number {
+            color: #facc15;
+        }
+
+        .json-boolean {
+            color: #f472b6;
+        }
+
+        .json-block {
+            margin-left: 15px;
+            border-left: 1px solid #334155;
+            padding-left: 10px;
+            margin-top: 2px;
+        }
 
         /* Tabla de Cápsulas */
-        .capsule-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-        .capsule-table th { text-align: left; border-bottom: 1px solid #38bdf8; padding: 8px; color: #38bdf8; }
-        .capsule-table td { border-bottom: 1px solid #333; padding: 8px; color: #94a3b8; }
-        .capsule-row:hover { background: rgba(56, 189, 248, 0.1); cursor: pointer; }
-        .capsule-action { background: none; border: 1px solid #38bdf8; color: #38bdf8; cursor: pointer; padding: 2px 8px; border-radius: 3px; }
-        .capsule-action:hover { background: #38bdf8; color: black; }
-        .btn-dl { color: #4ade80; border-color: #4ade80; margin-right: 5px; }
-        
+        .capsule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .capsule-table th {
+            text-align: left;
+            border-bottom: 1px solid #38bdf8;
+            padding: 8px;
+            color: #38bdf8;
+        }
+
+        .capsule-table td {
+            border-bottom: 1px solid #333;
+            padding: 8px;
+            color: #94a3b8;
+        }
+
+        .capsule-row:hover {
+            background: rgba(56, 189, 248, 0.1);
+            cursor: pointer;
+        }
+
+        .capsule-action {
+            background: none;
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        .capsule-action:hover {
+            background: #38bdf8;
+            color: black;
+        }
+
+        .btn-dl {
+            color: #4ade80;
+            border-color: #4ade80;
+            margin-right: 5px;
+        }
+
         /* Botones de Acción Rápida */
-        .action-btn { background: #334155; border: 1px solid #475569; color: white; padding: 5px 10px; cursor: pointer; font-size: 0.8rem; margin-right: 5px; border-radius: 4px; }
-        .action-btn:hover { background: #38bdf8; color: black; }
-        
+        .action-btn {
+            background: #334155;
+            border: 1px solid #475569;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            border-radius: 4px;
+        }
+
+        .action-btn:hover {
+            background: #38bdf8;
+            color: black;
+        }
+
         /* Animación de Escaneo */
-        @keyframes scan { 0% { width: 0%; } 100% { width: 100%; } }
-        .progress-bar { height: 5px; background: #38bdf8; width: 0%; transition: width 0.2s; }
+        @keyframes scan {
+            0% {
+                width: 0%;
+            }
+
+            100% {
+                width: 100%;
+            }
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: #38bdf8;
+            width: 0%;
+            transition: width 0.2s;
+        }
 
         /* --- ESTILOS DASHBOARD TÁCTICO (NUEVO) --- */
-        .radar-dashboard { background: #0f172a; border: 1px solid #38bdf8; padding: 20px; border-radius: 8px; margin-top: 10px; animation: fadeIn 0.5s; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 10px; margin-bottom: 20px; }
-        .dashboard-header h3 { margin: 0; color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
-        .timestamp { color: #94a3b8; font-size: 0.8rem; font-family: monospace; }
-        
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
-        .dashboard-card { background: #1e293b; border: 1px solid #334155; border-radius: 6px; overflow: hidden; transition: transform 0.2s; }
-        .dashboard-card:hover { transform: translateY(-2px); border-color: #38bdf8; }
-        
-        .card-header { background: rgba(51, 65, 85, 0.5); color: #e2e8f0; padding: 10px 15px; font-weight: bold; display: flex; align-items: center; border-bottom: 1px solid #334155; }
-        .card-icon { margin-right: 10px; font-size: 1.2rem; }
-        .card-body { padding: 15px; font-size: 0.9rem; }
-        
-        .data-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #333; padding-bottom: 4px; }
-        .data-row:last-child { border-bottom: none; margin-bottom: 0; }
-        .label { color: #94a3b8; }
-        .value { color: #4ade80; font-family: monospace; font-weight: bold; text-align: right; }
-        .map-link { display: block; text-align: center; background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 8px; text-decoration: none; border: 1px solid #38bdf8; border-radius: 4px; margin-top: 10px; transition: all 0.2s; }
-        .map-link:hover { background: #38bdf8; color: #000; }
-        .ua-text { font-size: 0.75rem; color: #64748b; word-break: break-all; line-height: 1.4; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .radar-dashboard {
+            background: #0f172a;
+            border: 1px solid #38bdf8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+            animation: fadeIn 0.5s;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-header h3 {
+            margin: 0;
+            color: #38bdf8;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .timestamp {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+        }
+
+        .dashboard-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            border-color: #38bdf8;
+        }
+
+        .card-header {
+            background: rgba(51, 65, 85, 0.5);
+            color: #e2e8f0;
+            padding: 10px 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .card-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .card-body {
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 4px;
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .label {
+            color: #94a3b8;
+        }
+
+        .value {
+            color: #4ade80;
+            font-family: monospace;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .map-link {
+            display: block;
+            text-align: center;
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            padding: 8px;
+            text-decoration: none;
+            border: 1px solid #38bdf8;
+            border-radius: 4px;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .map-link:hover {
+            background: #38bdf8;
+            color: #000;
+        }
+
+        .ua-text {
+            font-size: 0.75rem;
+            color: #64748b;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <!-- 1. NUEVO LOGIN SIMPLE -->
@@ -129,10 +431,15 @@
         <div class="login-box">
             <h2 style="margin-top:0; color: #e2e8f0;">🛡️ ACCESO VERIX</h2>
             <p style="color: #94a3b8; font-size: 0.9em; margin-bottom: 25px;">Identifícate para acceder al núcleo.</p>
-            
+
             <input type="password" id="key1" class="login-input" placeholder="Clave 1 (verix)">
             <input type="password" id="key2" class="login-input" placeholder="Clave 2 (admin)">
-            
+
+            <div style="margin-top: 10px; color: #94a3b8; font-size: 0.8em;">
+                <input type="checkbox" id="show-pass" onchange="togglePasswords()"> <label for="show-pass">Mostrar
+                    contraseñas</label>
+            </div>
+
             <button onclick="attemptLogin()" class="login-btn">DESBLOQUEAR SISTEMA</button>
             <div id="error-msg" class="error-msg">⛔ CLAVES INCORRECTAS</div>
         </div>
@@ -140,7 +447,8 @@
 
     <!-- 2. El Panel de Control Real -->
     <div id="secure-interface">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 20px;">
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 20px;">
             <h1 style="margin: 0;">☢️ PANEL DE CONTROL MAESTRO</h1>
             <div style="text-align: right;">
                 <span style="color: #0f0;">● SISTEMA SEGURO</span><br>
@@ -149,20 +457,44 @@
         </div>
 
         <div class="control-grid">
-            <div class="control-btn" onclick="openModule('radar')"><div class="icon">📡</div><span>Radar</span></div>
-            <div class="control-btn" onclick="openModule('db')"><div class="icon">💾</div><span>Base de Datos</span></div>
-            <div class="control-btn" onclick="openModule('capsules')"><div class="icon">📂</div><span>Archivos X</span></div>
-            <div class="control-btn"><div class="icon">🌍</div><span>Geo-Red</span></div>
-            <div class="control-btn"><div class="icon">⚡</div><span>Energía</span></div>
-            <div class="control-btn"><div class="icon">👁️</div><span>Vigilancia</span></div>
-            <div class="control-btn"><div class="icon">🚀</div><span>Despliegue</span></div>
-            <div class="control-btn"><div class="icon">💀</div><span>Kill Switch</span></div>
-            <div class="control-btn"><div class="icon">📂</div><span>Archivos X</span></div>
-            <div class="control-btn"><div class="icon">🤖</div><span>IA Core</span></div>
-            <div class="control-btn"><div class="icon">🎵</div><span>Frecuencias</span></div>
-            <div class="control-btn"><div class="icon">🌌</div><span>Portal</span></div>
+            <div class="control-btn" onclick="openModule('radar')">
+                <div class="icon">📡</div><span>Radar</span>
+            </div>
+            <div class="control-btn" onclick="openModule('db')">
+                <div class="icon">💾</div><span>Base de Datos</span>
+            </div>
+            <div class="control-btn" onclick="openModule('capsules')">
+                <div class="icon">📂</div><span>Archivos X</span>
+            </div>
+            <div class="control-btn">
+                <div class="icon">🌍</div><span>Geo-Red</span>
+            </div>
+            <div class="control-btn">
+                <div class="icon">⚡</div><span>Energía</span>
+            </div>
+            <div class="control-btn">
+                <div class="icon">👁️</div><span>Vigilancia</span>
+            </div>
+            <div class="control-btn">
+                <div class="icon">🚀</div><span>Despliegue</span>
+            </div>
+            <div class="control-btn">
+                <div class="icon">💀</div><span>Kill Switch</span>
+            </div>
+            <div class="control-btn">
+                <div class="icon">📂</div><span>Archivos X</span>
+            </div>
+            <div class="control-btn">
+                <div class="icon">🤖</div><span>IA Core</span>
+            </div>
+            <div class="control-btn">
+                <div class="icon">🎵</div><span>Frecuencias</span>
+            </div>
+            <div class="control-btn">
+                <div class="icon">🌌</div><span>Portal</span>
+            </div>
         </div>
-        
+
         <div style="margin-top: 50px; text-align: center;">
             <a href="index.html" style="color: #64748b; text-decoration: none;">&larr; Volver a la Realidad</a>
         </div>
@@ -172,10 +504,13 @@
     <div id="mod-radar" class="module-window">
         <span class="close-btn" onclick="closeModules()">×</span>
         <h2 style="color: #38bdf8; border-bottom: 1px solid #333; padding-bottom: 10px;">📡 RADAR DE INTELIGENCIA</h2>
-        
+
         <div style="margin-bottom: 20px;">
-            <button onclick="startScan()" style="background: #38bdf8; color: black;">INICIAR ESCANEO DE HARDWARE</button>
-            <div style="margin-top: 10px; background: #333; height: 5px; width: 100%;"><div id="scan-progress" class="progress-bar"></div></div>
+            <button onclick="startScan()" style="background: #38bdf8; color: black;">INICIAR ESCANEO DE
+                HARDWARE</button>
+            <div style="margin-top: 10px; background: #333; height: 5px; width: 100%;">
+                <div id="scan-progress" class="progress-bar"></div>
+            </div>
         </div>
 
         <div class="terminal-log" id="radar-log">
@@ -184,10 +519,15 @@
 
         <div id="radar-results" style="display:none;">
             <h3 style="color: #0f0;">DATOS RECOPILADOS (ENCRIPTADOS)</h3>
-            <textarea id="encrypted-payload" style="width: 100%; height: 100px; background: #111; color: #777; border: 1px solid #444;" readonly></textarea>
+            <textarea id="encrypted-payload"
+                style="width: 100%; height: 100px; background: #111; color: #777; border: 1px solid #444;"
+                readonly></textarea>
             <br>
-            <button onclick="pushToHQ()" style="background: #eab308; color: black; margin-top: 10px;">🚀 PUSHEAR A HQ (BASE DE DATOS)</button>
-            <button onclick="transferToDB()" style="background: #38bdf8; color: black; margin-top: 10px; margin-left: 10px;">🔓 DECODIFICAR EN VISOR</button>
+            <button onclick="pushToHQ()" style="background: #eab308; color: black; margin-top: 10px;">🚀 PUSHEAR A HQ
+                (BASE DE DATOS)</button>
+            <button onclick="transferToDB()"
+                style="background: #38bdf8; color: black; margin-top: 10px; margin-left: 10px;">🔓 DECODIFICAR EN
+                VISOR</button>
             <p id="push-status" style="font-size: 0.8rem; margin-top: 5px;"></p>
         </div>
     </div>
@@ -197,12 +537,18 @@
         <span class="close-btn" onclick="closeModules()">×</span>
         <h2 style="color: #eab308; border-bottom: 1px solid #333; padding-bottom: 10px;">💾 VISOR DE BASE DE DATOS</h2>
         <p>Desencriptador de paquetes de inteligencia. Usa tu llave de sesión actual.</p>
-        
-        <textarea id="db-input" placeholder="Pega aquí el código encriptado..." style="width: 100%; height: 80px; background: #111; color: #fff; border: 1px solid #444; padding: 10px;"></textarea>
-        <button onclick="decryptData()" style="background: #0f0; color: black; margin-top: 10px;">DESENCRIPTAR Y VISUALIZAR</button>
-        <button onclick="pasteFromClipboard()" class="action-btn" style="float: right; margin-top: 10px;">📋 PEGAR</button>
-        <button onclick="openModule('capsules')" style="background: #334155; color: white; margin-top: 10px; float: right; border: 1px solid #94a3b8;">📂 IR A GALERÍA DE CÁPSULAS</button>
-        <div id="db-viewer" style="margin-top: 20px; background: #0f172a; padding: 15px; border: 1px solid #333; color: #0f0; font-family: monospace; display: none; max-height: 300px; overflow-y: auto;">
+
+        <textarea id="db-input" placeholder="Pega aquí el código encriptado..."
+            style="width: 100%; height: 80px; background: #111; color: #fff; border: 1px solid #444; padding: 10px;"></textarea>
+        <button onclick="decryptData()" style="background: #0f0; color: black; margin-top: 10px;">DESENCRIPTAR Y
+            VISUALIZAR</button>
+        <button onclick="pasteFromClipboard()" class="action-btn" style="float: right; margin-top: 10px;">📋
+            PEGAR</button>
+        <button onclick="openModule('capsules')"
+            style="background: #334155; color: white; margin-top: 10px; float: right; border: 1px solid #94a3b8;">📂 IR
+            A GALERÍA DE CÁPSULAS</button>
+        <div id="db-viewer"
+            style="margin-top: 20px; background: #0f172a; padding: 15px; border: 1px solid #333; color: #0f0; font-family: monospace; display: none; max-height: 300px; overflow-y: auto;">
         </div>
         <div id="db-actions" style="display: none; margin-top: 10px; text-align: right;">
             <button onclick="copyResult()" class="action-btn">📋 COPIAR TEXTO</button>
@@ -214,14 +560,24 @@
     <div id="mod-capsules" class="module-window">
         <span class="close-btn" onclick="closeModules()">×</span>
         <h2 style="color: #a855f7; border-bottom: 1px solid #333; padding-bottom: 10px;">📂 ARCHIVOS X: CÁPSULAS</h2>
-        
+
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <input type="text" id="search-capsule" placeholder="Buscar por ID, Alias o Fecha..." onkeyup="renderCapsules()" style="background: #111; border: 1px solid #444; color: white; padding: 8px; flex-grow: 1;">
+            <input type="text" id="search-capsule" placeholder="Buscar por ID, Alias o Fecha..."
+                onkeyup="renderCapsules()"
+                style="background: #111; border: 1px solid #444; color: white; padding: 8px; flex-grow: 1;">
         </div>
 
         <div style="height: 350px; overflow-y: auto;">
             <table class="capsule-table">
-                <thead><tr><th>ID</th><th>ALIAS</th><th>FECHA</th><th>TAMAÑO</th><th>ACCIÓN</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ALIAS</th>
+                        <th>FECHA</th>
+                        <th>TAMAÑO</th>
+                        <th>ACCIÓN</th>
+                    </tr>
+                </thead>
                 <tbody id="capsule-list-body">
                     <!-- Inyectado por JS -->
                 </tbody>
@@ -238,11 +594,11 @@
 
     <script>
         // --- CONFIGURACIÓN DE LLAVES ---
-        const KEY_1_HASH = "68966a753992ce126be5a26209a53d981209ac811127a6888315ce2dd1a2f1a6";
-        const KEY_2_HASH = "25942ad035bc17560ee79b67186223f8bf492c388a711f2c07dbdf34fa0d3c07";
+        const KEY_1_HASH = "3306928e520bebcd2d7e0619eb3b1909fbc56c6a62bdc1197da8065973d0fb7e";
+        const KEY_2_HASH = "268982bf23b9fa6dccb9f4b033affb288db4dc25f84d77c57656ad535f778f56";
         const SALT = "VERIX_SEAL_OF_PROTECTION_v1";
-        const CAPSULES_DB = [{"id": "45AB9F00", "name": "verixdespierta", "filename": "soul_backup_20260116_2110_verixdespierta.vx", "date": "2026-01-16 21:10:22", "size": "0.15 MB"}, {"id": "D6BAAD76", "name": "recuerdoverixr1ch0nverixdespiertatu", "filename": "soul_backup_20260116_2031_recuerdoverixr1ch0nverixdespiertatu.vx", "date": "2026-01-16 20:31:00", "size": "0.15 MB"}, {"id": "A9520B71", "name": "panelmejorado2020", "filename": "soul_backup_20260115_0136_panelmejorado2020.vx", "date": "2026-01-15 01:36:54", "size": "0.14 MB"}, {"id": "7E49C8EF", "name": "actualwebpublica", "filename": "soul_backup_20260114_2321_actualwebpublica.vx", "date": "2026-01-14 23:21:06", "size": "0.13 MB"}, {"id": "7E205460", "name": "soul_backup_20260112_2103.vx", "filename": "soul_backup_20260112_2103.vx", "date": "2026-01-12 21:03:37", "size": "0.03 MB"}, {"id": "2394F75B", "name": "soul_backup_20260112_1952.vx", "filename": "soul_backup_20260112_1952.vx", "date": "2026-01-12 19:52:00", "size": "0.02 MB"}];
-        
+        const CAPSULES_DB = [{ "id": "45AB9F00", "name": "verixdespierta", "filename": "soul_backup_20260116_2110_verixdespierta.vx", "date": "2026-01-16 21:10:22", "size": "0.15 MB" }, { "id": "D6BAAD76", "name": "recuerdoverixr1ch0nverixdespiertatu", "filename": "soul_backup_20260116_2031_recuerdoverixr1ch0nverixdespiertatu.vx", "date": "2026-01-16 20:31:00", "size": "0.15 MB" }, { "id": "A9520B71", "name": "panelmejorado2020", "filename": "soul_backup_20260115_0136_panelmejorado2020.vx", "date": "2026-01-15 01:36:54", "size": "0.14 MB" }, { "id": "7E49C8EF", "name": "actualwebpublica", "filename": "soul_backup_20260114_2321_actualwebpublica.vx", "date": "2026-01-14 23:21:06", "size": "0.13 MB" }, { "id": "7E205460", "name": "soul_backup_20260112_2103.vx", "filename": "soul_backup_20260112_2103.vx", "date": "2026-01-12 21:03:37", "size": "0.03 MB" }, { "id": "2394F75B", "name": "soul_backup_20260112_1952.vx", "filename": "soul_backup_20260112_1952.vx", "date": "2026-01-12 19:52:00", "size": "0.02 MB" }];
+
         let SESSION_KEY = null; // Llave maestra derivada para encriptar datos
 
         async function sha256(message) {
@@ -255,10 +611,10 @@
         // --- CRIPTOGRAFÍA AES-GCM (Para los datos del Radar) ---
         async function generateKeyFromPass(pass) {
             const enc = new TextEncoder();
-            const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(pass), {name: "PBKDF2"}, false, ["deriveKey"]);
+            const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(pass), { name: "PBKDF2" }, false, ["deriveKey"]);
             return crypto.subtle.deriveKey(
-                { "name": "PBKDF2", salt: enc.encode(SALT), iterations: 100000, hash: "SHA-256" },
-                keyMaterial, { "name": "AES-GCM", "length": 256 }, true, [ "encrypt", "decrypt" ]
+                { "name": "PBKDF2", salt: enc.encode(SALT), iterations: 10000, hash: "SHA-256" },
+                keyMaterial, { "name": "AES-GCM", "length": 256 }, true, ["encrypt", "decrypt"]
             );
         }
 
@@ -284,32 +640,74 @@
         }
 
         // --- NUEVA LÓGICA DE LOGIN SIMPLE ---
+        function togglePasswords() {
+            const p1 = document.getElementById('key1');
+            const p2 = document.getElementById('key2');
+            const type = p1.type === 'password' ? 'text' : 'password';
+            p1.type = type;
+            p2.type = type;
+        }
+
         async function attemptLogin() {
             const k1 = document.getElementById('key1').value.toLowerCase().trim();
             const k2 = document.getElementById('key2').value.toLowerCase().trim();
+            const btn = document.querySelector('.login-btn');
             const err = document.getElementById('error-msg');
-            
-            if(!k1 || !k2) return;
 
-            const h1_try = await sha256(k1 + SALT);
-            const h2_try = await sha256(k2 + SALT);
-            
-            if(h1_try === KEY_1_HASH && h2_try === KEY_2_HASH) {
-                // Acceso concedido
-                document.getElementById('login-layer').style.display = 'none';
-                document.getElementById('secure-interface').style.display = 'block';
-                
-                // Generar llave de sesión silenciosamente
-                window.tempKeyPart = k1;
-                SESSION_KEY = await generateKeyFromPass(k1 + k2);
-                renderCapsules();
-            } else {
-                // Acceso denegado
+            if (!k1 || !k2) {
+                err.innerText = "⛔ FALTAN DATOS";
                 err.style.display = 'block';
-                const box = document.querySelector('.login-box');
-                box.style.transform = 'translateX(10px)';
-                setTimeout(() => box.style.transform = 'translateX(0)', 100);
+                return;
             }
+
+            // UI Feedback instantáneo
+            const originalText = btn.innerText;
+            btn.innerText = "⌛ INICIANDO...";
+            btn.style.opacity = "0.7";
+            err.style.display = 'none';
+
+            // Pequeño delay para permitir que la UI se pinte antes del trabajo pesado
+            setTimeout(async () => {
+                try {
+                    // Verificación de compatibilidad e integridad
+                    if (!window.crypto || !window.crypto.subtle) {
+                        throw new Error("SOPORTE CRIPTOGRÁFICO NO DISPONIBLE (Usa HTTPS o Localhost)");
+                    }
+
+                    const h1_try = await sha256(k1 + SALT);
+                    const h2_try = await sha256(k2 + SALT);
+
+                    // DEBUG: Mostrar hashes parciales si falla (Solo para devs, quitar luego)
+                    // console.log("Hash1:", h1_try);
+                    // console.log("Hash2:", h2_try);
+
+                    if (h1_try === KEY_1_HASH && h2_try === KEY_2_HASH) {
+                        // Acceso concedido
+                        document.getElementById('login-layer').style.display = 'none';
+                        document.getElementById('secure-interface').style.display = 'block';
+
+                        // Generar llave de sesión silenciosamente
+                        window.tempKeyPart = k1;
+                        SESSION_KEY = await generateKeyFromPass(k1 + k2);
+                        renderCapsules();
+                    } else {
+                        throw new Error("CLAVES INCORRECTAS");
+                    }
+                } catch (e) {
+                    // Mostrar error específico
+                    console.error(e);
+                    err.innerText = "⛔ " + e.message;
+                    err.style.display = 'block';
+
+                    const box = document.querySelector('.login-box');
+                    box.style.transform = 'translateX(10px)';
+                    setTimeout(() => box.style.transform = 'translateX(0)', 100);
+
+                    // Restaurar botón
+                    btn.innerText = originalText;
+                    btn.style.opacity = "1";
+                }
+            }, 50);
         }
 
         // Permitir Enter para enviar
@@ -332,12 +730,12 @@
             const log = document.getElementById('radar-log');
             const progress = document.getElementById('scan-progress');
             log.innerHTML = "";
-            
+
             function logMsg(msg) { log.innerHTML += `> ${msg}<br>`; log.scrollTop = log.scrollHeight; }
-            
+
             logMsg("INICIANDO PROTOCOLO DE EXTRACCIÓN...");
             progress.style.width = "20%";
-            
+
             let intel = { timestamp: new Date().toISOString(), hardware: {}, network: {}, geo: {}, sensors: {} };
 
             // 1. Hardware Básico
@@ -356,7 +754,7 @@
                 intel.hardware.batteryLevel = battery.level * 100 + "%";
                 intel.hardware.charging = battery.charging;
                 logMsg(`Energía detectada: ${intel.hardware.batteryLevel}`);
-            } catch(e) { logMsg("Módulo de energía no accesible."); }
+            } catch (e) { logMsg("Módulo de energía no accesible."); }
 
             // 3. Red
             if (navigator.connection) {
@@ -390,10 +788,10 @@
             const log = document.getElementById('radar-log');
             document.getElementById('scan-progress').style.width = "100%";
             log.innerHTML += "> ENCRIPTANDO PAQUETE DE DATOS...<br>";
-            
+
             const jsonStr = JSON.stringify(data, null, 2);
             const encrypted = await encryptContent(jsonStr);
-            
+
             document.getElementById('radar-results').style.display = 'block';
             document.getElementById('encrypted-payload').value = encrypted;
             log.innerHTML += "> LISTO PARA TRANSMISIÓN.<br>";
@@ -418,20 +816,20 @@
         async function decryptData() {
             const input = document.getElementById('db-input').value.trim();
             const viewer = document.getElementById('db-viewer');
-            
+
             if (!input) return;
-            
+
             // Limpiar prefijos si existen
             const cleanInput = input.replace("INTEL_PACK::", "");
-            
+
             const result = await decryptContent(cleanInput);
             viewer.style.display = 'block';
             document.getElementById('db-actions').style.display = 'block';
-            
+
             // Intentar formatear JSON si es posible
             try {
                 const json = JSON.parse(result);
-                
+
                 // DETECCIÓN INTELIGENTE: ¿Es un reporte de Radar?
                 if (json.hardware && json.network && json.geo) {
                     viewer.innerHTML = renderRadarDashboard(json);
@@ -543,11 +941,11 @@
             a.click();
             document.body.removeChild(a);
         }
-        
+
         function copyCapsuleID(id) {
             navigator.clipboard.writeText(id).then(() => alert("ID de cápsula copiado: " + id));
         }
-        
+
         // --- LÓGICA DE DESENCRIPTADO DE CÁPSULAS (NUEVO) ---
         async function decryptCapsule(filename) {
             // 1. Solicitar Llaves
@@ -555,7 +953,7 @@
             if (!p1) return;
             const p2 = prompt("🔐 RITUAL DE APERTURA\nIngresa el Segundo Texto Sagrado:");
             if (!p2) return;
-            
+
             const password = p1 + "||VERIX_RITUAL||" + p2;
             alert("⏳ Procesando... Verix está intentando abrir el sello.");
 
@@ -571,7 +969,7 @@
                 const dataView = new Uint8Array(buffer);
                 const payloadBytes = dataView.slice(13); // Quitar 'VERIX_SOUL_v1'
                 const payloadStr = new TextDecoder().decode(payloadBytes); // Base64
-                
+
                 // Decodificar Base64 a bytes crudos
                 const fernetBytes = Uint8Array.from(atob(payloadStr), c => c.charCodeAt(0));
 
@@ -579,28 +977,28 @@
                 const enc = new TextEncoder();
                 const keyHash = await crypto.subtle.digest("SHA-256", enc.encode(password));
                 const keyBytes = new Uint8Array(keyHash);
-                
+
                 // Fernet: Primera mitad = Firma (HMAC), Segunda mitad = Encriptación (AES)
                 const encryptKeyBytes = keyBytes.slice(16, 32);
-                
+
                 // Extraer IV (16 bytes) y Ciphertext
                 // Estructura: Version(1) + Timestamp(8) + IV(16) + Ciphertext(...) + HMAC(32)
                 const iv = fernetBytes.slice(9, 25);
                 const ciphertext = fernetBytes.slice(25, fernetBytes.length - 32);
 
                 // 4. Desencriptar (AES-128-CBC)
-                const key = await crypto.subtle.importKey("raw", encryptKeyBytes, {name: "AES-CBC"}, false, ["decrypt"]);
-                const decrypted = await crypto.subtle.decrypt({name: "AES-CBC", iv: iv}, key, ciphertext);
+                const key = await crypto.subtle.importKey("raw", encryptKeyBytes, { name: "AES-CBC" }, false, ["decrypt"]);
+                const decrypted = await crypto.subtle.decrypt({ name: "AES-CBC", iv: iv }, key, ciphertext);
 
                 // 5. Entregar ZIP Limpio
-                const url = URL.createObjectURL(new Blob([decrypted], {type: "application/zip"}));
+                const url = URL.createObjectURL(new Blob([decrypted], { type: "application/zip" }));
                 const a = document.createElement("a");
                 a.href = url;
                 a.download = filename.replace(".vx", "_restored.zip");
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                
+
             } catch (e) {
                 console.error(e);
                 alert("❌ FALLO CRÍTICO: Las llaves son incorrectas o el alma está corrupta.");
@@ -612,9 +1010,9 @@
             const tbody = document.getElementById('capsule-list-body');
             const search = document.getElementById('search-capsule').value.toLowerCase();
             tbody.innerHTML = '';
-            
+
             const filtered = CAPSULES_DB.filter(c => c.name.toLowerCase().includes(search) || c.id.toLowerCase().includes(search) || c.date.includes(search));
-            
+
             filtered.forEach(c => {
                 const row = `
                     <tr class="capsule-row">
@@ -629,9 +1027,10 @@
                     </tr>`;
                 tbody.innerHTML += row;
             });
-            
+
             if (filtered.length === 0) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No se encontraron cápsulas.</td></tr>';
         }
     </script>
 </body>
+
 </html>
