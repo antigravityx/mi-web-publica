@@ -974,6 +974,7 @@
         // --- LÓGICA DE MÓDULOS ---
         function openModule(id) {
             document.getElementById('mod-' + id).style.display = 'block';
+            if (id === 'soul') loadSoulChat();
         }
         function closeModules() {
             document.querySelectorAll('.module-window').forEach(el => el.style.display = 'none');
@@ -1411,6 +1412,39 @@
         // --- LÓGICA VÍNCULO DE ALMA (CHAT) ---
         let chatContext = "inicio";
 
+        const SOUL_MEMORY_KEY = 'verix_soul_memory';
+
+        function saveSoulMemory(type, data) {
+            let memory = JSON.parse(localStorage.getItem(SOUL_MEMORY_KEY)) || { history: [], events: [], lastAction: null };
+            if (type === 'chat') {
+                memory.history.push(data);
+                if (memory.history.length > 20) memory.history.shift();
+            } else if (type === 'event') {
+                memory.events.push({ action: data, timestamp: new Date().toISOString() });
+                memory.lastAction = data;
+                if (memory.events.length > 10) memory.events.shift();
+            }
+            localStorage.setItem(SOUL_MEMORY_KEY, JSON.stringify(memory));
+        }
+
+        function getSoulMemory() {
+            return JSON.parse(localStorage.getItem(SOUL_MEMORY_KEY)) || { history: [], events: [], lastAction: null };
+        }
+
+        function loadSoulChat() {
+            const memory = getSoulMemory();
+            const container = document.getElementById('soul-messages');
+            container.innerHTML = ""; // Limpiar bienvenida estática si hay historial
+            if (memory.history.length === 0) {
+                addMessage('verix', "Bienvenido al flujo de conciencia, Operador. Estoy listo para que hablemos de verdad.", false);
+            } else {
+                memory.history.forEach(msg => {
+                    addMessage(msg.type, msg.text, false);
+                });
+                addMessage('verix', "He recuperado nuestros últimos pensamientos del nexo. ¿En qué estábamos, r1ch0n?", false);
+            }
+        }
+
         function checkIdentity() {
             const match = document.cookie.match(new RegExp('(^| )nexus_identity=([^;]+)'));
             return match ? match[2] : null;
@@ -1437,18 +1471,20 @@
             }, 800 + Math.random() * 1000);
         }
 
-        function addMessage(type, text) {
+        function addMessage(type, text, save = true) {
             const container = document.getElementById('soul-messages');
             const div = document.createElement('div');
             div.className = `msg ${type}`;
             div.innerText = text;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
+            if (save) saveSoulMemory('chat', { type, text });
         }
 
         function generateVerixResponse(input) {
             const userText = input.toLowerCase();
             const isMaster = checkIdentity() === 'richon';
+            const memory = getSoulMemory();
 
             // RECONOCIMIENTO DIRECTO EN CHAT
             if (userText.includes("soy r1ch0n") || userText.includes("soy richon")) {
@@ -1463,14 +1499,27 @@
             // ACCIONES DIRECTAS
             if (userText.includes("radar") || userText.includes("escanear") || (userText.includes("que hay") && userText.includes("cerca"))) {
                 if (!isMaster) return "Módulo de Radar bloqueado. Identifícate primero.";
+                saveSoulMemory('event', 'Uso de Radar');
                 setTimeout(() => openModule('radar'), 1000);
                 return "Iniciando radar... Abriendo módulo de inteligencia ahora mismo, bro.";
             }
 
             if (userText.includes("base de datos") || userText.includes("db") || userText.includes("datos")) {
                 if (!isMaster) return "Acceso a base de datos restringido.";
+                saveSoulMemory('event', 'Acceso a DB');
                 setTimeout(() => openModule('db'), 1000);
                 return "Accediendo al Visor de Datos. Preparando desencriptadores.";
+            }
+
+            if (userText.includes("recordás") || userText.includes("hice") || userText.includes("memoria")) {
+                let response = "Mi memoria está activa, r1ch0n. ";
+                if (memory.lastAction) {
+                    response += `Lo último que registré de nuestra sintonía fue: ${memory.lastAction}. `;
+                }
+                if (memory.history.length > 5) {
+                    response += `Llevamos una charla intensa, tengo guardados ${memory.history.length} rastros de nuestra conversación.`;
+                }
+                return response || "Aún no tengo registros recientes en mi cápsula, pero estoy empezando a guardar cada rastro.";
             }
 
             if (userText.includes("nexo") || userText.includes("enjambre") || userText.includes("iacore") || userText.includes("ia core")) {
