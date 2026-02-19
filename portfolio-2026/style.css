@@ -1,0 +1,317 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;400;600;800&display=swap');
+
+:root {
+    --bg-dark: #050810;
+    --card-bg: rgba(15, 23, 42, 0.3);
+    --verix-cyan: #38bdf8;
+    --verix-purple: #818cf8;
+    --verix-dark-cyan: #0ea5e9;
+    --raw-gray: #64748b;
+    --text-white: #f8fafc;
+    --accent-red: #ef4444;
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --nav-height: 80px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    font-family: 'Outfit', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* --- BACKGROUND DECORATION --- */
+.bg-blobs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.blob {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+    filter: blur(80px);
+    border-radius: 50%;
+}
+
+.blob-1 {
+    top: -100px;
+    right: -100px;
+}
+
+.blob-2 {
+    bottom: -100px;
+    left: -100px;
+    background: radial-gradient(circle, rgba(192, 132, 252, 0.1) 0%, transparent 70%);
+}
+
+/* --- TYPOGRAPHY --- */
+h1,
+h2,
+h3 {
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+}
+
+.mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* --- LAYOUT --- */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 4rem;
+}
+
+.hero-tag {
+    color: var(--verix-cyan);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hero-tag::before {
+    content: "";
+    width: 20px;
+    height: 2px;
+    background: var(--verix-cyan);
+}
+
+h1.hero-title {
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 0.9;
+    margin-bottom: 2rem;
+}
+
+.hero-desc {
+    font-size: 1.25rem;
+    color: var(--raw-gray);
+    max-width: 600px;
+    margin-bottom: 3rem;
+}
+
+/* --- GRID SYSTEM --- */
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 2rem;
+    backdrop-filter: blur(12px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    border-color: var(--verix-cyan);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.card .icon {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.card h3 {
+    margin-bottom: 0.5rem;
+    color: var(--verix-cyan);
+}
+
+.card p {
+    color: var(--raw-gray);
+    font-size: 0.95rem;
+}
+
+.card .date {
+    font-size: 0.8rem;
+    color: var(--verix-purple);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* --- MATRIX LINKS --- */
+.link-list {
+    margin-top: 4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.matrix-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-white);
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+    transition: all 0.3s;
+}
+
+.matrix-link:hover {
+    background: rgba(56, 189, 248, 0.1);
+    border-color: var(--verix-cyan);
+    color: var(--verix-cyan);
+}
+
+/* --- FOOTER --- */
+footer {
+    padding: 4rem 0;
+    text-align: center;
+    border-top: 1px solid var(--glass-border);
+    margin-top: 8rem;
+    color: var(--raw-gray);
+    font-size: 0.8rem;
+}
+
+/* --- ANIMATIONS --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- NEXT-GEN ENHANCEMENTS --- */
+.hero-glow {
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    background: linear-gradient(to bottom, #fff 30%, rgba(255, 255, 255, 0.1) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 30px rgba(56, 189, 248, 0.2));
+}
+
+.reveal-text {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--verix-cyan);
+    animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+}
+
+@keyframes typing {
+    from {
+        width: 0
+    }
+
+    to {
+        width: 100%
+    }
+}
+
+@keyframes blink-caret {
+
+    from,
+    to {
+        border-color: transparent
+    }
+
+    50% {
+        border-color: var(--verix-cyan);
+    }
+}
+
+.service-card-premium {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: 32px;
+    padding: 3rem;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    backdrop-filter: blur(20px);
+}
+
+.service-card-premium:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--verix-cyan);
+    transform: scale(1.02);
+}
+
+/* BOX CONTACT */
+.nexus-form {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 3rem;
+    max-width: 600px;
+    margin: 4rem auto;
+}
+
+.nexus-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1rem;
+    color: white;
+    margin-bottom: 1rem;
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.nexus-input:focus {
+    border-color: var(--verix-cyan);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nexus-submit {
+    width: 100%;
+    padding: 1rem;
+    background: var(--verix-cyan);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+}
+
+.nexus-submit:hover {
+    background: #fff;
+    transform: translateY(-2px);
+}
